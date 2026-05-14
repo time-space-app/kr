@@ -1,0 +1,28 @@
+# kimilguk
+.env
+config.php
+/core/*.zip
+/core/*.tar.gz
+# Dependencies
+/vendor/
+
+# Configuration and Environment
+.env
+.env.local
+.env.*.local
+
+# Logs and temporary files
+*.log
+/var/log/
+/tmp/
+
+# Testing
+.phpunit.result.cache
+/tests/_output/
+/tests/_support/_generated/
+
+# OS and IDE specific
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
