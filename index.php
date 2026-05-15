@@ -1,10 +1,4 @@
-<?php include_once '/var/www/html/core/_header.php'; ?>
-<div class="m9-grid-1">
-<div class="m9-column-1">
-<div>&nbsp;</div>
-</div>
-</div>
-
+<?php include_once __DIR__.'/core/_header.php'; ?>
 <div class="m9-grid-block">
 <div class="m9-grid-1">
 <div class="m9-column-1">

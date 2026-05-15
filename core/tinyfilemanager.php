@@ -5038,8 +5038,8 @@ function fm_show_header_login()
             function edit_save(e, t) {
 				try {
 					// 에러가 발생할 가능성이 있는 코드 (예: 정의되지 않은 변수 사용) kimilguk
-					var _header = "<?php echo "<?php include_once '$_SERVER[DOCUMENT_ROOT]/core/_header.php'; ?>" ?>";
-					var _footer = "<?php echo "<?php include_once '$_SERVER[DOCUMENT_ROOT]/core/_footer.php'; ?>" ?>";
+					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header.php'; ?>" ?>";
+					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer.php'; ?>" ?>";
 					<?php if(FM_THEME=="dark") { ?>
 					if (oEditors) {
 						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);

@@ -1,69 +1,4 @@
-<?php
-session_start();
-try {
-    // 1. 사용자의 DB 연결 정보 입력 및 초기 테이블 생성
-    $servername = "db";
-    $username = "myuser";
-    $password = "mypassword";
-    $dbname = "mydatabase";
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    $sql = "CREATE TABLE IF NOT EXISTS board (
-      id INT AUTO_INCREMENT COMMENT '게시글 번호',
-      title VARCHAR(255) NOT NULL COMMENT '제목',
-      content TEXT NOT NULL COMMENT '내용',
-      file_name VARCHAR(255) DEFAULT NULL COMMENT '저장된 파일명',
-      file_path VARCHAR(255) DEFAULT NULL COMMENT '실제 파일 저장 경로',
-      writer VARCHAR(255) NOT NULL COMMENT '작성자',
-      reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '작성일',
-      view_count INT DEFAULT 0 COMMENT '조회수',
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='게시판'
-    ";
-    $conn->query($sql);
-    // 2. 글 작성 처리 (POST)
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['title']) && isset($_SESSION['filemanager']['logged'])) {
-        $title = $_POST['title'];
-        $content = $_POST['content'];
-        $title = $conn->real_escape_string($title);
-        $content = $conn->real_escape_string($content);
-        $fileName = null;
-        $filePath = null;
-        // 파일 업로드 처리
-        if ($_FILES['upload_file']['name']) {
-            $targetDir = "board_upload/";
-            // 파일명 중복 피하기 위해 고유 아이디 사용 추천
-            $fileName = basename($_FILES["upload_file"]["name"]);
-            $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-            $file_ext = strtolower($ext);
-            $filePath = $targetDir . date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
-            // 파일 업로드
-            if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $filePath)) {
-                // 성공적으로 저장됨
-            } else {
-                echo "파일 업로드 실패.";
-            }
-        }
-        $stmt = $conn->prepare("INSERT INTO board (title, content, file_name, file_path, writer) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $title, $content, $fileName, $filePath, $_SESSION['filemanager']['logged']);
-        $stmt->execute();
-        header("Location: index.php"); // 페이지 새로고침
-        exit;
-    }
-    // 3. 글 목록 불러오기
-    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 현재 페이지 번호 가져오기 (기본값 1)
-    if ($page < 1) $page = 1;
-    $itemsPerPage = 5; // 한 페이지에 보여줄 개수
-    $offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 5
-    $sql = "SELECT * FROM board ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
-    $result = $conn->query($sql);
-    if ($conn !== null) {
-        $conn->close(); // 1. 물리적 연결 닫기
-        $conn = null;   // 2. 객체 참조 제거
-    }
-} catch(Exception $e) {
-    //echo $e->getMessage(); //DB 연결 미 작업에러 발생 시 페이지 상단에 No such file or directory 가 표시
-}
-?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -161,30 +96,191 @@ try {
         
         /* 게시판 페이징 디자인 설정 */
         .pagination {
-            display: flex;
+            display: none; /* 기본 숨김 display: flex; */
             justify-content: center;
             gap: 5px;
             margin-top: 20px;
         }
-        
         /* 이전/다음 버튼 전용 */
-        .pagination a.nav-btn {
+        .pagination .nav-btn {
             font-weight: bold;
             background-color: #e5e5e5;
             color: #007bff;
             border: 1px solid #007bff;
             text-align: center;
         }
-        
-        .pagination a.nav-btn:hover {
+        .pagination .nav-btn:hover {
             background-color: #007bff;
             color: white;
             border: 1px solid #007bff;
         }
+        
+        /* 레이어 팝업 배경 */
+        .layer-popup {
+            display: none; /* 기본 숨김 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 어두운 배경 */
+            z-index: 1000;
+        }
+        /* 팝업 박스 */
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        /* 헤더 및 닫기 버튼 */
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .close-btn {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 40px;
+        }
+        /* 바디 */
+        .popup-body {
+            margin-top: 15px;
+            min-height: 100px;
+        }
     </style>
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <script>
+    $(document).ready(function() {
+        loadList();
+        // 2. 등록 버튼 클릭 이벤트
+        $('.btn-submit').click(function(e) {
+            e.preventDefault(); // 기본 폼 제출 막기
+            var formData = new FormData($('#boardForm')[0]);
+            formData.append('mode', 'insert');
+            $.ajax({
+                url: '/core/board-api.php', // 서버 저장 API 주소
+                type: 'POST',
+                data: formData,
+                contentType: false, // 필수: multipart/form-data 설정
+                processData: false, // 필수: 데이터 쿼리 스트링 변환 막기
+                success: function(data) {
+                    alert(data.message);
+                    $('#title').val('');
+                    $('#content').val('');
+                    loadList(); // 목록 새로고침
+                }
+            });
+        });
+    
+        // 게시글 목록을 불러오는 함수
+        function loadList(page_location) {
+            let numberValue = Number(document.getElementById('page').innerText);
+            if(page_location=='prev') numberValue--;
+            if(page_location=='next') numberValue++;
+            $.ajax({
+                url: '/core/board-api.php', // 서버 목록 API 주소
+                type: 'GET',
+                data: { 
+                    page: numberValue, 
+                    mode: "list" 
+                },
+                success: function(data) {
+                    let html = '';
+                    // 데이터 수만큼 반복하여 테이블 row 생성
+                    $.each(data.result, function(index, item) {
+                        html += '<div class="list-item" style="cursor:pointer" data-id="' + item.id + '">';
+                        html += '<div class="col-no">' + item.id + '</div>';
+                        html += '<div class="col-title">' + item.title + '</div>';
+                        html += '<div class="col-writer">' + item.writer + '</div>';
+                        html += '<div class="col-date">' + item.reg_date + '</div>';
+                        html += '</div>';
+                    });
+                    if(data.result.length>0) {
+                        $('.pagination').attr("style", "display:flex;");
+                        $('.pagination').show();
+                    }
+                    document.getElementById('page').innerText = data.page;
+                    $('#ajax-list').html(html);
+                }
+            });
+        }
+        // 이전5개 클릭
+        $(document).on('click', '.prev', function(e) {
+            e.preventDefault();
+            loadList('prev');
+        });
+        // 다음5개 클릭
+        $(document).on('click', '.next', function(e) {
+            e.preventDefault();
+            loadList('next');
+        });
+        
+        // 글보기 닫기 버튼 이벤트
+        $('.close-btn, .layer-popup').click(function(e) {
+            if($(e.target).hasClass('layer-popup') || $(e.target).hasClass('close-btn')) {
+                $('#layer-popup').hide();
+            }
+        });
+        // 글보기 버튼 이벤트
+        $(document).on('click', '.list-item', function(e) {
+            e.preventDefault();
+            var boardId = $(this).data('id');
+            // AJAX로 데이터 가져오기
+            $.ajax({
+                url: "/core/board-api.php",
+                type: "POST",
+                data: { id: boardId, mode: "view" },
+                success: function(data) {
+                    // 데이터 삽입
+                    let response = data.result;
+                    $("#popup-title").text(response.title);
+                    $('#popup-body-content').html(response.content);
+                    $('#layer-popup').show();
+                }
+            });
+        });
+        
+    });
+    </script>
+    <!-- 내용보기 레이어 팝업 -->
+    <div id="layer-popup" class="layer-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 class="view-title"><span class="popup-title" id="popup-title">로딩 중...</span></h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="board-container">
+                <div class="view-header">
+                    <div class="view-info">
+                        <span>작성자: 홍길동</span>
+                        <span>작성일: 2026-05-13</span>
+                        <span>조회수: 123</span>
+                    </div>
+                </div>
+                <div class="view-content popup-body" id="popup-body-content">
+                    <p>로딩 중...</p>
+                </div>
+                <?php if (isset($_SESSION['filemanager']['logged'])) { ?>
+                <div class="view-actions">
+                    <button type="button" class="btn btn-edit">수정하기</button>
+                    <button type="button" class="btn btn-delete">삭제하기</button>
+                </div>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
     <div class="board-container">
         <h2>글쓰기/글수정</h2>
-        <form action="./" method="post" enctype="multipart/form-data">
+        <form action="./" method="post" id="boardForm" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">제목</label>
                 <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
@@ -198,34 +294,12 @@ try {
                 <input type="file" id="upload_file" name="upload_file"><br>
             </div>
             <div class="view-actions">
-            <button type="submit" class="btn btn-submit">등록하기</button>
-            <button type="submit" class="btn btn-edit">수정하기</button>
-            <button type="submit" class="btn btn-delete">삭제하기</button>
+            <button type="button" class="btn btn-submit">등록하기</button>
             <button type="button" class="btn btn-list">목록보기</button>
             </div>
         </form>
     </div>
-    <div class="board-container">
-        <div class="view-header">
-            <h2 class="view-title">반응형 게시판 글보기 예제입니다.</h2>
-            <div class="view-info">
-                <span>작성자: 홍길동</span>
-                <span>작성일: 2026-05-13</span>
-                <span>조회수: 123</span>
-            </div>
-        </div>
-        
-        <div class="view-content">
-            <p>반응형 웹 사이트 소스 예제입니다.</p>
-            <p>화면 크기에 따라 폰트 사이즈와 레이아웃이 유연하게 변경됩니다.</p>
-            <p>모바일에서도 가독성이 좋게 스타일링 되었습니다.</p>
-        </div>
-        
-        <div class="view-actions">
-            <button type="button" class="btn btn-list">목록보기</button>
-            <button type="button" class="btn btn-edit">수정하기</button>
-        </div>
-    </div>
+    
     <div class="board-container">
         <h2>공지사항</h2>
         <div class="board-list">
@@ -236,28 +310,15 @@ try {
                 <div class="col-writer">작성자</div>
                 <div class="col-date">작성일</div>
             </div>
-            <!-- 아이템 시작 -->
-            <?php if($result && mysqli_num_rows($result) > 0) { ?>
-                <?php while($row = mysqli_fetch_assoc($result)): ?>
-                <div class="list-item">
-                    <div class="col-no"><?php echo $row['id'] ?></div>
-                    <div class="col-title"><a href="#"><?php echo htmlspecialchars($row['title']) ?></a></div>
-                    <div class="col-writer"><?php echo $row['writer'] ?></div>
-                    <div class="col-date"><?php echo $row['reg_date'] ?></div>
-                </div>
-                <?php endwhile; ?>
-                <div class="pagination">
-                    <a class="nav-btn btn" href="?page=<?php echo ($page-1) ?>">이전 5개</a>
-                    <a class="nav-btn btn" href="?page=<?php echo ($page+1) ?>">다음 5개</a>
-                </div>
-            <?php }else{ ?>
-                <div class="list-item">
-                    <div class="col-no">&nbsp;</div>
-                    <div class="col-title"><a href="#">등록된 데이터가 없습니다.</a></div>
-                    <div class="col-writer">관리자</div>
-                    <div class="col-date">&nbsp;</div>
-                </div>
-            <?php } ?>
-            <!-- 아이템 끝 -->
+            <!-- Ajax로 데이터 갱신 시작 -->
+            <div id="ajax-list">
+            
+            </div>
+            <!-- Ajax로 데이터 갱신 끝 -->
+            <div class="pagination">
+                <a class="nav-btn btn prev" href="#">이전 5개</a>
+                <span id="page" class="nav-btn btn"></span>
+                <a class="nav-btn btn next" href="#">다음 5개</a>
+            </div>
         </div>
     </div>

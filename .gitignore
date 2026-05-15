@@ -1,5 +1,7 @@
 # kimilguk
+env.php
 .env
+*.sql
 config.php
 /core/*.zip
 /core/*.tar.gz

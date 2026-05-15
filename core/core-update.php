@@ -9,7 +9,7 @@ if (!isset($_SESSION['filemanager']['logged'])) {
  chown -R www-data:www-data /var/www/html
  */
 // 1. 최신 버전 정보 가져오기
-$remote_version_url = 'https://raw.githubusercontent.com/time-space-app/kr-update/refs/heads/master/version.json';
+$remote_version_url = 'https://raw.githubusercontent.com/time-space-app/kr-update/refs/heads/main/version.json';
 $local_version = '0.9'; // 현재 내 사이트 버전
 
 $remote_info = json_decode(file_get_contents($remote_version_url), true);
