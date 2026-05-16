@@ -35,15 +35,21 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        textarea { height: 300px; resize: vertical; }
+        textarea { height: auto; resize: vertical; }
+        .btn-popup {
+            background-color: #007bff;
+        }
         .btn-submit {
             background-color: #007bff;
         }
-        .btn-edit {
+        .btn-edit, .edit-item {
             background-color: #0b57d0;
         }
         .btn-delete {
             background-color: #FF0000;
+        }
+        .btn-close {
+            background-color: #808080;
         }
         .btn-list {
             background-color: #808080;
@@ -69,29 +75,6 @@
             .view-title { font-size: 18px; }
             .view-content { font-size: 14px; }
             .view-actions { text-align: center; }
-        }
-        
-        /* 목록 보기+반응형 설정 */
-        .col-no { width: 10%; text-align: center; }
-        .col-title { width: 60%; }
-        .col-writer { width: 15%; text-align: center; }
-        .col-date { width: 15%; text-align: center; }
-        @media (max-width: 480px) {
-            .list-header { display: none; } /* 헤더 숨김 */
-            .list-item {
-                flex-direction: column; /* 세로 배치 */
-                align-items: flex-start;
-                padding: 15px;
-            }
-            .col-no, .col-title, .col-writer, .col-date {
-                width: 100%;
-                text-align: left;
-                padding: 2px 0;
-            }
-            .col-title { font-size: 1.1em; font-weight: bold; }
-            .col-no::before { content: "No. "; color: #888; }
-            .col-writer::before { content: "작성자: "; color: #888; }
-            .col-date::before { content: "날짜: "; color: #888; }
         }
         
         /* 게시판 페이징 디자인 설정 */
@@ -132,7 +115,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
+            width: 80%;
             background-color: white;
             padding: 20px;
             border-radius: 8px;
@@ -161,7 +144,45 @@
     <script>
     $(document).ready(function() {
         loadList();
-        // 2. 등록 버튼 클릭 이벤트
+        // 2. CRUD 버튼 클릭 이벤트
+        $('.btn-delete').click(function(e) {
+            e.preventDefault(); // 기본 폼 제출 막기
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+            var formData = new FormData($('#editForm')[0]);
+            formData.append('mode', 'delete');
+            $.ajax({
+                url: '/core/board-api.php', // 서버 저장 API 주소
+                type: 'POST',
+                data: formData,
+                contentType: false, // 필수: multipart/form-data 설정
+                processData: false, // 필수: 데이터 쿼리 스트링 변환 막기
+                success: function(data) {
+                    alert(data.message);
+                    $('#title').val('');
+                    $('#content').val('');
+                    loadList(); // 목록 새로고침
+                    $('.layer-popup').hide();
+                }
+            });
+        });
+        $('.btn-edit').click(function(e) {
+            e.preventDefault(); // 기본 폼 제출 막기
+            var formData = new FormData($('#editForm')[0]);
+            formData.append('mode', 'edit');
+            $.ajax({
+                url: '/core/board-api.php', // 서버 저장 API 주소
+                type: 'POST',
+                data: formData,
+                contentType: false, // 필수: multipart/form-data 설정
+                processData: false, // 필수: 데이터 쿼리 스트링 변환 막기
+                success: function(data) {
+                    alert(data.message);
+                    //$('#editForm')[0].reset();
+                    loadList(); // 목록 새로고침
+                    //$('.layer-popup').hide();
+                }
+            });
+        });
         $('.btn-submit').click(function(e) {
             e.preventDefault(); // 기본 폼 제출 막기
             var formData = new FormData($('#boardForm')[0]);
@@ -174,16 +195,25 @@
                 processData: false, // 필수: 데이터 쿼리 스트링 변환 막기
                 success: function(data) {
                     alert(data.message);
-                    $('#title').val('');
-                    $('#content').val('');
+                    $('#boardForm')[0].reset();
                     loadList(); // 목록 새로고침
+                    $('.layer-popup').hide();
                 }
             });
         });
-    
         // 게시글 목록을 불러오는 함수
         function loadList(page_location) {
-            let numberValue = Number(document.getElementById('page').innerText);
+            let numberValue = Number($('#page').text());
+            let pagination = '<div class="pagination">';
+                pagination += '<a class="nav-btn btn prev" href="#">이전</a>';
+                pagination += '<span id="page" class="nav-btn btn"></span>';
+                pagination += '<a class="nav-btn btn next" href="#">다음</a>';
+                <?php if (isset($_SESSION['filemanager']['logged'])) { ?>
+                pagination += '<button type="button" class="btn btn-popup">글등록창</button>';
+                <?php } ?>
+                pagination += '</div>';
+            $('.pagination').remove();
+            $('.m9-list-style-1').after(pagination);
             if(page_location=='prev') numberValue--;
             if(page_location=='next') numberValue++;
             $.ajax({
@@ -197,42 +227,65 @@
                     let html = '';
                     // 데이터 수만큼 반복하여 테이블 row 생성
                     $.each(data.result, function(index, item) {
-                        html += '<div class="list-item" style="cursor:pointer" data-id="' + item.id + '">';
-                        html += '<div class="col-no">' + item.id + '</div>';
-                        html += '<div class="col-title">' + item.title + '</div>';
-                        html += '<div class="col-writer">' + item.writer + '</div>';
-                        html += '<div class="col-date">' + item.reg_date + '</div>';
-                        html += '</div>';
+                        html += '<li class="float-left display-inline-block e-float-none e-display-block m9-margin-right-1 e-m9-margin-right-0 list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
                     });
                     if(data.result.length>0) {
                         $('.pagination').attr("style", "display:flex;");
                         $('.pagination').show();
+                        document.getElementById('page').innerText = data.page;
+                        $('.m9-list-style-1').html(html);
+                    }else{
+                        $('.pagination').attr("style", "display:flex;");
+                        $('.pagination').show();
+                        document.getElementById('page').innerText = data.page-1;
                     }
-                    document.getElementById('page').innerText = data.page;
-                    $('#ajax-list').html(html);
                 }
             });
         }
-        // 이전5개 클릭
+        // 이전 게시글 클릭
         $(document).on('click', '.prev', function(e) {
             e.preventDefault();
             loadList('prev');
         });
-        // 다음5개 클릭
+        // 다음 게시글 클릭
         $(document).on('click', '.next', function(e) {
             e.preventDefault();
             loadList('next');
         });
-        
         // 글보기 닫기 버튼 이벤트
-        $('.close-btn, .layer-popup').click(function(e) {
-            if($(e.target).hasClass('layer-popup') || $(e.target).hasClass('close-btn')) {
-                $('#layer-popup').hide();
-            }
+        $('.close-btn, .btn-close').click(function(e) { //.layer-popup, 
+            $('.layer-popup').hide();
         });
-        // 글보기 버튼 이벤트
+        // 글등록창 보기 이벤트
+        $(document).on('click', '.btn-popup', function(e) {
+            e.preventDefault();
+            $('#boardForm')[0].reset();
+            $('#write-popup').show();
+        });
+        // 글수정창 보기 이벤트
+        $(document).on('click', '.edit-item', function(e) {
+            e.preventDefault();
+            var boardId = $('#popup-title').attr('data-id');
+            // AJAX로 데이터 가져오기
+            $.ajax({
+                url: "/core/board-api.php",
+                type: "POST",
+                data: { id: boardId, mode: "view" },
+                success: function(data) {
+                    $('.layer-popup').hide();
+                    // 데이터 삽입
+                    let response = data.result;
+                    $('#editForm #title').val(response.title);
+                    $('#editForm #content').val(response.content);
+                    $('#editForm #id').val(boardId);
+                    $('#edit-popup').show();
+                }
+            });
+        });
+        // 글보기창 보기 이벤트
         $(document).on('click', '.list-item', function(e) {
             e.preventDefault();
+            $('.layer-popup').hide();
             var boardId = $(this).data('id');
             // AJAX로 데이터 가져오기
             $.ajax({
@@ -243,16 +296,35 @@
                     // 데이터 삽입
                     let response = data.result;
                     $("#popup-title").text(response.title);
+                    $('#popup-title').attr('data-id', response.id);
                     $('#popup-body-content').html(response.content);
-                    $('#layer-popup').show();
+                    $('#view-popup').show();
                 }
             });
         });
-        
+        // 수정창에서 글보기창 보기 이벤트
+        $(document).on('click', '.view-item', function(e) {
+            e.preventDefault();
+            $('.layer-popup').hide();
+            var boardId = $('#editForm #id').val();
+            // AJAX로 데이터 가져오기
+            $.ajax({
+                url: "/core/board-api.php",
+                type: "POST",
+                data: { id: boardId, mode: "view" },
+                success: function(data) {
+                    let response = data.result;
+                    $("#popup-title").text(response.title);
+                    $('#popup-title').attr('data-id', response.id);
+                    $('#popup-body-content').html(response.content);
+                    $('#view-popup').show();
+                }
+            });
+        });
     });
     </script>
     <!-- 내용보기 레이어 팝업 -->
-    <div id="layer-popup" class="layer-popup">
+    <div id="view-popup" class="layer-popup">
         <div class="popup-content">
             <div class="popup-header">
                 <h2 class="view-title"><span class="popup-title" id="popup-title">로딩 중...</span></h2>
@@ -271,54 +343,71 @@
                 </div>
                 <?php if (isset($_SESSION['filemanager']['logged'])) { ?>
                 <div class="view-actions">
-                    <button type="button" class="btn btn-edit">수정하기</button>
-                    <button type="button" class="btn btn-delete">삭제하기</button>
+                    <button type="button" class="btn btn-close">창닫기</button>
+                    <button type="button" class="btn edit-item">수정하기</button>
                 </div>
                 <?php } ?>
             </div>
         </div>
     </div>
-    <div class="board-container">
-        <h2>글쓰기/글수정</h2>
-        <form action="./" method="post" id="boardForm" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="title">제목</label>
-                <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+    <div id="edit-popup" class="layer-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 class="view-title"><span class="popup-title">글수정</span></h2>
+                <button class="close-btn">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="content">내용</label>
-                <textarea id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+            <div class="board-container">
+                <form action="./" method="post" id="editForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">내용</label>
+                        <textarea id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="upload_file">첨부파일</label>
+                        <input type="file" id="upload_file" name="upload_file"><br>
+                    </div>
+                    <?php if (isset($_SESSION['filemanager']['logged'])) { ?>
+                    <div class="view-actions">
+                        <input type="hidden" id="id" name="id" placeholder="글고유id" required>
+                        <button type="button" class="btn btn-list view-item">글보기</button>
+                        <button type="button" class="btn btn-edit">수정하기</button>
+                        <button type="button" class="btn btn-delete">삭제하기</button>
+                        <button type="button" class="btn btn-close">창닫기</button>
+                    </div>
+                    <?php } ?>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="upload_file">첨부파일</label>
-                <input type="file" id="upload_file" name="upload_file"><br>
-            </div>
-            <div class="view-actions">
-            <button type="button" class="btn btn-submit">등록하기</button>
-            <button type="button" class="btn btn-list">목록보기</button>
-            </div>
-        </form>
+        </div>
     </div>
-    
-    <div class="board-container">
-        <h2>공지사항</h2>
-        <div class="board-list">
-            <!-- 헤더 (데스크탑) -->
-            <div class="list-header">
-                <div class="col-no">번호</div>
-                <div class="col-title">제목</div>
-                <div class="col-writer">작성자</div>
-                <div class="col-date">작성일</div>
+    <div id="write-popup" class="layer-popup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h2 class="view-title"><span class="popup-title">글쓰기</span></h2>
+                <button class="close-btn">&times;</button>
             </div>
-            <!-- Ajax로 데이터 갱신 시작 -->
-            <div id="ajax-list">
-            
-            </div>
-            <!-- Ajax로 데이터 갱신 끝 -->
-            <div class="pagination">
-                <a class="nav-btn btn prev" href="#">이전 5개</a>
-                <span id="page" class="nav-btn btn"></span>
-                <a class="nav-btn btn next" href="#">다음 5개</a>
+            <div class="board-container">
+                <form action="./" method="post" id="boardForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">내용</label>
+                        <textarea id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="upload_file">첨부파일</label>
+                        <input type="file" id="upload_file" name="upload_file"><br>
+                    </div>
+                    <div class="view-actions">
+                    <button type="button" class="btn btn-submit">등록하기</button>
+                    <button type="button" class="btn btn-close">창닫기</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

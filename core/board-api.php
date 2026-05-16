@@ -32,7 +32,7 @@ try {
 	switch ($mode) {
 		case 'insert':
 			// 2. 글 작성 처리 (POST)
-			if (isset($_POST['title']) && isset($_SESSION['filemanager']['logged'])) {
+			if (isset($_POST['title']) && !empty($_POST['title']) && isset($_SESSION['filemanager']['logged'])) {
 				$title = $_POST['title'];
 				$content = $_POST['content'];
 				$title = $conn->real_escape_string($title);
@@ -57,30 +57,111 @@ try {
 				$stmt = $conn->prepare("INSERT INTO board (title, content, file_name, file_path, writer) VALUES (?, ?, ?, ?, ?)");
 				$stmt->bind_param("sssss", $title, $content, $fileName, $filePath, $_SESSION['filemanager']['logged']);
 				$stmt->execute();
+				if ($stmt->affected_rows > 0) {
+					$response = ['result' => 'success', 'message' => '글이 작성되었습니다.'];
+				} else {
+					$response = ['result' => 'fail', 'message' => '글이 작성되지 않았습니다.'];
+				}
+				$stmt->close();
+			}else{
+				$response = ['result' => 'fail', 'message' => '글의 입력값이 올바르지 않습니다.'];
+			}
+			break;
+		case 'edit':
+			// 2. 글 수정 처리 (POST)
+			if (isset($_POST['title']) && !empty($_POST['title']) && isset($_SESSION['filemanager']['logged'])) {
+				$id = $_POST['id']; // 게시글 번호
+				$title = $_POST['title'];
+				$content = $_POST['content'];
+				$title = $conn->real_escape_string($title);
+				$content = $conn->real_escape_string($content);
+				$fileName = null;
+				$filePath = null;
+				// 파일 업로드 처리
+				if ($_FILES['upload_file']['name']) {
+					$targetDir = "board_upload/";
+					// 파일명 중복 피하기 위해 고유 아이디 사용 추천
+					$fileName = basename($_FILES["upload_file"]["name"]);
+					$ext = pathinfo($fileName, PATHINFO_EXTENSION);
+					$file_ext = strtolower($ext);
+					$filePath = $targetDir . date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
+					// 파일 업로드
+					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $filePath)) {
+						// 성공적으로 저장됨
+					} else {
+						$response = ['result' => 'fail', 'message' => '파일업로드 오류가 발생 되었습니다.'];
+					}
+				}
+				$sql = "UPDATE board SET title = ?, content = ?, file_name = ?, file_path = ? WHERE id = ?";
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("ssssi", $title, $content, $fileName, $filePath, $id);
+				$stmt->execute();
 				//header("Location: index.php"); // 페이지 새로고침
 				//exit;
+				if ($stmt->affected_rows > 0) {
+					$response = ['result' => 'success', 'message' => '글이 수정되었습니다.'];
+				} else {
+					$response = ['result' => 'fail', 'message' => '글이 수정되지 않았습니다.'];
+				}
+				$stmt->close();
+			}else{
+				$response = ['result' => 'fail', 'message' => '글의 입력값이 올바르지 않습니다.'];
 			}
-			$response = ['result' => 'success', 'message' => '글이 작성되었습니다.'];
 			break;
 		case 'view':
-			$sql = "SELECT * FROM board WHERE id =".$_POST['id'];
-			$result = $conn->query($sql);
-			$row = mysqli_fetch_assoc($result);
-			$response = ['result' => $row, 'message' => '글이 로드되었습니다.'];
+			if (isset($_POST['id']) && !empty($_POST['id'])) {
+				$id = $_POST['id']; // 게시글 번호
+				$sql = "SELECT * FROM board WHERE id = ?";
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $id);
+				$stmt->execute();
+				$result = $stmt->get_result();
+				$row = $result->fetch_assoc();
+				$response = ['result' => $row, 'message' => '글이 로드되었습니다.'];
+			}else{
+				$response = ['result' => 'fail', 'message' => '글의 입력값이 올바르지 않습니다.'];
+			}
+			break;
+		case 'delete':
+			if (isset($_POST['id']) && !empty($_POST['id']) && isset($_SESSION['filemanager']['logged'])) {
+				$id = $_POST['id']; // 게시글 번호
+				$sql = "DELETE FROM board WHERE id = ?";
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $id);
+				$stmt->execute();
+				if ($stmt->affected_rows > 0) {
+					$response = ['result' => 'success', 'message' => '글이 삭제되었습니다.'];
+				} else {
+					$response = ['result' => 'fail', 'message' => '글이 삭제되지 않았습니다.'];
+				}
+				$stmt->close();
+			}else{
+				$response = ['result' => 'fail', 'message' => '글의 입력값이 올바르지 않습니다.'];
+			}
 			break;
 		default:
 			// 3. 글 목록 불러오기
+			$keyword = $_GET['search'] ?? ''; // 사용자 입력 검색어
 			$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 현재 페이지 번호 가져오기 (기본값 1)
 			if ($page < 1) $page = 1;
-			$itemsPerPage = 5; // 한 페이지에 보여줄 개수
-			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 5
-			$sql = "SELECT * FROM board ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
-			$result = $conn->query($sql);
+			$itemsPerPage = 6; // 한 페이지에 보여줄 개수
+			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 6
+			$sql = "SELECT * FROM board WHERE title LIKE ? ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
+			$stmt = $conn->prepare($sql);
+			$search_param = "%" . $keyword . "%";
+			$stmt->bind_param("s", $search_param);
+			$stmt->execute();
+			$result = $stmt->get_result();
 			$posts = array();
-			while($row = mysqli_fetch_assoc($result)) {
-				$posts[] = $row;
+			if ($result->num_rows > 0) {
+				while($row = $result->fetch_assoc()) {
+					$posts[] = $row;
+				}
+				$response = ['result' => $posts, 'message' => '글이 로드되었습니다.', 'page' => $page];
+			} else {
+				$response = ['result' => $posts, 'message' => '등록된 글이 없습니다.', 'page' => $page];
 			}
-			$response = ['result' => $posts, 'message' => '글이 로드되었습니다.', 'page' => $page];
+			$stmt->close();
 			break;
 	}
 	if ($conn !== null) {
