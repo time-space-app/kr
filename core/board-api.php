@@ -14,14 +14,18 @@ try {
     $username = $_ENV['DB_USER'] ?? $env['DB_USER'];
     $password = $_ENV['DB_PASS'] ?? $env['DB_PASS'];
     $dbname = $_ENV['DB_NAME'] ?? $env['DB_NAME'];
+	$uploadDir = $_ENV['UPLOAD_DIR'] ?? $env['UPLOAD_DIR']; // 첨부파일 경로 설정
+	if (!is_dir($uploadDir)) {
+		mkdir($uploadDir, 0755, true);
+	}
     // 1. DB 연결 및 초기 테이블 생성
     $conn = new mysqli($servername, $username, $password, $dbname);
     $sql = "CREATE TABLE IF NOT EXISTS board (
       id INT AUTO_INCREMENT COMMENT '게시글 번호',
       title VARCHAR(255) NOT NULL COMMENT '제목',
       content TEXT NOT NULL COMMENT '내용',
-      file_name VARCHAR(255) DEFAULT NULL COMMENT '저장된 파일명',
-      file_path VARCHAR(255) DEFAULT NULL COMMENT '실제 파일 저장 경로',
+      file_name VARCHAR(255) DEFAULT NULL COMMENT '업로드 시 파일명',
+      file_save_name VARCHAR(255) DEFAULT NULL COMMENT '실제 저장된 파일명',
       writer VARCHAR(255) NOT NULL COMMENT '작성자',
       reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '작성일',
       view_count INT DEFAULT 0 COMMENT '조회수',
@@ -38,24 +42,24 @@ try {
 				$title = $conn->real_escape_string($title);
 				$content = $conn->real_escape_string($content);
 				$fileName = null;
-				$filePath = null;
+				$fileSaveName = null;
 				// 파일 업로드 처리
 				if ($_FILES['upload_file']['name']) {
-					$targetDir = "board_upload/";
+					//$uploadDir = "board_upload/";
 					// 파일명 중복 피하기 위해 고유 아이디 사용 추천
 					$fileName = basename($_FILES["upload_file"]["name"]);
 					$ext = pathinfo($fileName, PATHINFO_EXTENSION);
 					$file_ext = strtolower($ext);
-					$filePath = $targetDir . date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
+					$fileSaveName = date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
 					// 파일 업로드
-					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $filePath)) {
+					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $uploadDir . $fileSaveName)) {
 						// 성공적으로 저장됨
 					} else {
 						$response = ['result' => 'fail', 'message' => '파일업로드 오류가 발생 되었습니다.'];
 					}
 				}
-				$stmt = $conn->prepare("INSERT INTO board (title, content, file_name, file_path, writer) VALUES (?, ?, ?, ?, ?)");
-				$stmt->bind_param("sssss", $title, $content, $fileName, $filePath, $_SESSION['filemanager']['logged']);
+				$stmt = $conn->prepare("INSERT INTO board (title, content, file_name, file_save_name, writer) VALUES (?, ?, ?, ?, ?)");
+				$stmt->bind_param("sssss", $title, $content, $fileName, $fileSaveName, $_SESSION['filemanager']['logged']);
 				$stmt->execute();
 				if ($stmt->affected_rows > 0) {
 					$response = ['result' => 'success', 'message' => '글이 작성되었습니다.'];
@@ -76,26 +80,48 @@ try {
 				$title = $conn->real_escape_string($title);
 				$content = $conn->real_escape_string($content);
 				$fileName = null;
-				$filePath = null;
+				$fileSaveName = null;
 				// 파일 업로드 처리
 				if ($_FILES['upload_file']['name']) {
-					$targetDir = "board_upload/";
+					//$uploadDir = "board_upload/";
 					// 파일명 중복 피하기 위해 고유 아이디 사용 추천
 					$fileName = basename($_FILES["upload_file"]["name"]);
 					$ext = pathinfo($fileName, PATHINFO_EXTENSION);
 					$file_ext = strtolower($ext);
-					$filePath = $targetDir . date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
+					$fileSaveName = date('YmdHis') . "_" . uniqid() . "." . $ext; // 저장 경로
 					// 파일 업로드
-					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $filePath)) {
+					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $uploadDir . $fileSaveName)) {
+						//기존파일이 있다면 삭제 시작
+						$sql = "SELECT * FROM board WHERE id = ?";
+						$stmt = $conn->prepare($sql);
+						$stmt->bind_param("i", $id);
+						$stmt->execute();
+						$result = $stmt->get_result();
+						$row = $result->fetch_assoc();
+						// 서버에 실제 파일이 존재하는지 확인하고 삭제합니다.
+						if ($result->num_rows > 0) {
+							$oldFileSaveName = $row['file_save_name'];
+							if (file_exists($uploadDir . $oldFileSaveName)) {
+								unlink($uploadDir . $oldFileSaveName); // 실제 서버 파일 삭제
+							}
+						}
+						$stmt->close();
+						//기존파일이 있다면 삭제 끝
 						// 성공적으로 저장됨
+						$sql = "UPDATE board SET title = ?, content = ?, file_name = ?, file_save_name = ? WHERE id = ?";
+						$stmt = $conn->prepare($sql);
+						$stmt->bind_param("ssssi", $title, $content, $fileName, $fileSaveName, $id);
+						$stmt->execute();
 					} else {
 						$response = ['result' => 'fail', 'message' => '파일업로드 오류가 발생 되었습니다.'];
 					}
+					
+				}else{
+					$sql = "UPDATE board SET title = ?, content = ? WHERE id = ?";
+					$stmt = $conn->prepare($sql);
+					$stmt->bind_param("ssi", $title, $content, $id);
+					$stmt->execute();
 				}
-				$sql = "UPDATE board SET title = ?, content = ?, file_name = ?, file_path = ? WHERE id = ?";
-				$stmt = $conn->prepare($sql);
-				$stmt->bind_param("ssssi", $title, $content, $fileName, $filePath, $id);
-				$stmt->execute();
 				//header("Location: index.php"); // 페이지 새로고침
 				//exit;
 				if ($stmt->affected_rows > 0) {
@@ -118,6 +144,11 @@ try {
 				$result = $stmt->get_result();
 				$row = $result->fetch_assoc();
 				$response = ['result' => $row, 'message' => '글이 로드되었습니다.'];
+				$sql = "UPDATE board SET view_count = view_count + 1 WHERE id = ?";
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $id);
+				$stmt->execute();
+				$stmt->close();
 			}else{
 				$response = ['result' => 'fail', 'message' => '글의 입력값이 올바르지 않습니다.'];
 			}
@@ -125,6 +156,19 @@ try {
 		case 'delete':
 			if (isset($_POST['id']) && !empty($_POST['id']) && isset($_SESSION['filemanager']['logged'])) {
 				$id = $_POST['id']; // 게시글 번호
+				$sql = "SELECT * FROM board WHERE id = ?";
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $id);
+				$stmt->execute();
+				$result = $stmt->get_result();
+				$row = $result->fetch_assoc();
+				// 서버에 실제 파일이 존재하는지 확인하고 삭제합니다.
+				if ($result->num_rows > 0) {
+					$fileSaveName = $row['file_save_name'];
+					if (file_exists($uploadDir . $fileSaveName)) {
+						unlink($uploadDir . $fileSaveName); // 실제 서버 파일 삭제
+					}
+				}
 				$sql = "DELETE FROM board WHERE id = ?";
 				$stmt = $conn->prepare($sql);
 				$stmt->bind_param("i", $id);
@@ -144,8 +188,8 @@ try {
 			$keyword = $_GET['search'] ?? ''; // 사용자 입력 검색어
 			$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 현재 페이지 번호 가져오기 (기본값 1)
 			if ($page < 1) $page = 1;
-			$itemsPerPage = 6; // 한 페이지에 보여줄 개수
-			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 6
+			$itemsPerPage = 4; // 한 페이지에 보여줄 개수
+			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 4
 			$sql = "SELECT * FROM board WHERE title LIKE ? ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
 			$stmt = $conn->prepare($sql);
 			$search_param = "%" . $keyword . "%";

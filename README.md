@@ -23,10 +23,15 @@
 - https://github.com/mong9/smarteditor2-plugin-mong9-editor (GNU General Public License v3.0)
 
 #### 현재 작업 중인 내용(아래)
-- mysql 기반의 1페이지 게시판을 작업 중이며, 현재 게시판 DB테이블과 CRUD 반응형 디자인을 작성하였음. 페이징 처리 추가
-- RestAPI+Ajax 방식으로 index.php 1페이지에서 CRUD를 작업할 예정 
+- 메뉴는 템플릿 디자인이 없기 때문에 1개만 별도 제작 중.
+
 #### 앞으로 작업예정(아래)
+- 몽9에디터의 템플릿디자인과 연동도는 구글지도맵, 게시판, 메뉴까지 _module.php 로 별도로 분리한다.
 - 매뉴얼 작업
+
+#### 작업내역 정리(아래)
+- RestAPI+Ajax 방식으로 index.php 1페이지에서 CRUD를 작업완료
+- mysql 기반의 1페이지 게시판을 작업 중이며, 현재 게시판 DB테이블과 CRUD 반응형 디자인을 작성하였음. 페이징 처리 추가
 
 ### 개발환경(아래)
 #### 도커 데스크탑의 컨테이너로 개발환경을 사용(아래)

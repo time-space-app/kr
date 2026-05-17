@@ -142,6 +142,18 @@
     </style>
     <script src="https://code.jquery.com/jquery-latest.js"></script>
     <script>
+	function downloadFile(file_save_name) {
+			// 1. 임시 a 태그 생성
+			const link = document.createElement('a');
+			link.href = `core/file_download.php?file_save_name=${encodeURIComponent(file_save_name)}`;
+			link.download = file_save_name; // 다운로드될 파일명 지정
+			// 2. 화면에 숨겨서 추가 (필수)
+			link.style.display = 'none';
+			document.body.appendChild(link);
+			// 3. 클릭 이벤트 발생 및 태그 제거
+			link.click();
+			document.body.removeChild(link);
+		}
     $(document).ready(function() {
         loadList();
         // 2. CRUD 버튼 클릭 이벤트
@@ -179,6 +191,7 @@
                     alert(data.message);
                     //$('#editForm')[0].reset();
                     loadList(); // 목록 새로고침
+					$('.view-item').trigger('click');
                     //$('.layer-popup').hide();
                 }
             });
@@ -213,7 +226,7 @@
                 <?php } ?>
                 pagination += '</div>';
             $('.pagination').remove();
-            $('.m9-list-style-1').after(pagination);
+            $("[class^='m9-list-style-']").after(pagination);
             if(page_location=='prev') numberValue--;
             if(page_location=='next') numberValue++;
             $.ajax({
@@ -227,13 +240,17 @@
                     let html = '';
                     // 데이터 수만큼 반복하여 테이블 row 생성
                     $.each(data.result, function(index, item) {
-                        html += '<li class="float-left display-inline-block e-float-none e-display-block m9-margin-right-1 e-m9-margin-right-0 list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
+						if ($("[class^='m9-list-style-'] li").hasClass('display-inline-block')) {
+							html += '<li class="float-left display-inline-block e-float-none e-display-block m9-margin-right-1 e-m9-margin-right-0 list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
+						}else{
+							html += '<li class="list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
+						}
                     });
                     if(data.result.length>0) {
                         $('.pagination').attr("style", "display:flex;");
                         $('.pagination').show();
                         document.getElementById('page').innerText = data.page;
-                        $('.m9-list-style-1').html(html);
+						$("[class^='m9-list-style-']").html(html);
                     }else{
                         $('.pagination').attr("style", "display:flex;");
                         $('.pagination').show();
@@ -265,6 +282,7 @@
         // 글수정창 보기 이벤트
         $(document).on('click', '.edit-item', function(e) {
             e.preventDefault();
+			$('#editForm')[0].reset();
             var boardId = $('#popup-title').attr('data-id');
             // AJAX로 데이터 가져오기
             $.ajax({
@@ -278,6 +296,14 @@
                     $('#editForm #title').val(response.title);
                     $('#editForm #content').val(response.content);
                     $('#editForm #id').val(boardId);
+					if($('.download-real-file').length > 0) $('.download-real-file').remove();
+					if(response.file_name) {
+					$('.download-file').text(response.file_name);
+					$('.download-file').after('<a href="#" onclick="downloadFile(\''+response.file_save_name+'\')" class="download-real-file">다운로드</a>');
+					}else{
+					$('.download-file').text('');
+					$('.download-real-file').remove();
+					}
                     $('#edit-popup').show();
                 }
             });
@@ -298,6 +324,17 @@
                     $("#popup-title").text(response.title);
                     $('#popup-title').attr('data-id', response.id);
                     $('#popup-body-content').html(response.content);
+					$('.view-writer').html(response.writer);
+					$('.view-count').html(response.view_count);
+					$('.view-reg_date').html(response.reg_date);
+					if($('.download-real-file').length > 0) $('.download-real-file').remove();
+					if(response.file_name) {
+					$('.download-file').text(response.file_name);
+					$('.download-file').after('<a href="#" onclick="downloadFile(\''+response.file_save_name+'\')" class="download-real-file">다운로드</a>');
+					}else{
+					$('.download-file').text('');
+					$('.download-real-file').remove();
+					}
                     $('#view-popup').show();
                 }
             });
@@ -317,6 +354,14 @@
                     $("#popup-title").text(response.title);
                     $('#popup-title').attr('data-id', response.id);
                     $('#popup-body-content').html(response.content);
+					if($('.download-real-file').length > 0) $('.download-real-file').remove();
+					if(response.file_name) {
+					$('.download-file').text(response.file_name);
+					$('.download-file').after('<a href="#" onclick="downloadFile(\''+response.file_save_name+'\')" class="download-real-file">다운로드</a>');
+					}else{
+					$('.download-file').text('');
+					$('.download-real-file').remove();
+					}
                     $('#view-popup').show();
                 }
             });
@@ -333,9 +378,10 @@
             <div class="board-container">
                 <div class="view-header">
                     <div class="view-info">
-                        <span>작성자: 홍길동</span>
-                        <span>작성일: 2026-05-13</span>
-                        <span>조회수: 123</span>
+                        작성자: <span class="view-writer">홍길동</span>
+                        작성일: <span class="view-reg_date">2026-05-13</span>
+                        조회수: <span class="view-count">123</span>
+						첨부파일: <span class="download-file"></span>
                     </div>
                 </div>
                 <div class="view-content popup-body" id="popup-body-content">
@@ -370,6 +416,7 @@
                         <label for="upload_file">첨부파일</label>
                         <input type="file" id="upload_file" name="upload_file"><br>
                     </div>
+					첨부된 파일: <span class="download-file"></span>
                     <?php if (isset($_SESSION['filemanager']['logged'])) { ?>
                     <div class="view-actions">
                         <input type="hidden" id="id" name="id" placeholder="글고유id" required>
