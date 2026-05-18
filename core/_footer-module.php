@@ -1,5 +1,20 @@
 <!-- 메뉴 모듈 시작 -->
-    <!-- 구글 번역기가 시작 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <div class="floating-container">
+        <div class="floating-menu">
+            <a href=".top" class="sub-button"><i class="fa fa-home"></i>&nbsp;홈으로</a>
+            <a href=".m9-list-style-" class="sub-button"><i class="fa fa-envelope"></i>&nbsp;게시판</a>
+            <a href=".m9-google_map" class="sub-button"><i class="fa fa-share-alt"></i>&nbsp;오시는길</a>
+            <span class="sub-button lang-link" data-lang="zh-CN" style="cursor:pointer;"><i class="fa fa-file-o"></i>&nbsp;중국어</span>
+            <span class="sub-button lang-link" data-lang="en" style="cursor:pointer;"><i class="fa fa-file-text-o"></i>&nbsp;영&nbsp;&nbsp;&nbsp;어</span>
+            <span class="sub-button lang-link" data-lang="ja" style="cursor:pointer;"><i class="fa fa-file-code-o"></i>&nbsp;일본어</span>
+            <span class="sub-button lang-link" data-lang="ko" style="cursor:pointer;"><i class="fa fa-file-text"></i>&nbsp;한국어</span>
+        </div>
+        <div class="floating-button">
+            <i class="fa fa-bars"></i>
+        </div>
+    </div>
+    <!-- 구글 번역기 시작 -->
     <div id="google_translate_element" style="display: none;"></div>
     <script type="text/javascript">
       // 1. 구글 번역 초기화 함수
@@ -13,7 +28,7 @@
           'google_translate_element'
         );
       }
-      // 2. a 링크 클릭 시 언어 변경 함수
+      // 2. 해당 언어 링크 클릭 시 언어 변경 함수
       function changeLanguage(langCode) {
         var event = null;
         var selects = document.getElementsByClassName('goog-te-combo');
@@ -44,22 +59,8 @@
       });
     </script>
     <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-    <!-- 구글 번역기가 끝 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
-    <div class="floating-container">
-        <div class="floating-menu">
-            <a href=".top" class="sub-button"><i class="fa fa-home"></i>&nbsp;홈으로</a>
-            <a href=".m9-list-style-" class="sub-button"><i class="fa fa-envelope"></i>&nbsp;게시판</a>
-            <a href=".m9-google_map" class="sub-button"><i class="fa fa-share-alt"></i>&nbsp;오시는길</a>
-            <a href="javascript:void(0);" class="sub-button lang-link" data-lang="zh-CN"><i class="fa fa-file-o"></i>&nbsp;중국어</a>
-            <a href="javascript:void(0);" class="sub-button lang-link" data-lang="en"><i class="fa fa-file-text-o"></i>&nbsp;영어</a>
-            <a href="javascript:void(0);" class="sub-button lang-link" data-lang="ja"><i class="fa fa-file-code-o"></i>&nbsp;일본어</a>
-            <a href="javascript:void(0);" class="sub-button lang-link" data-lang="ko"><i class="fa fa-file-text"></i>&nbsp;한국어</a>
-        </div>
-        <div class="floating-button">
-            <i class="fa fa-bars"></i>
-        </div>
-    </div>
+    <!-- 구글 번역기 끝 -->
+    
     <script>
     //메뉴 링크 액션(아래)
     $(document).ready(function(){
@@ -152,8 +153,11 @@
     
     /* 메뉴가 열렸을 때 */
     .floating-container.active .floating-menu {
-        max-height: 200px;
+        max-height: 400px;
         overflow: visible;
+    }
+    @media (min-width: 768px) {
+       .floating-container.active .floating-menu { max-height: 300px; } /* 데스크톱에서는 버튼 크기 줄이기 */
     }
     
     .floating-container.active .floating-button {
