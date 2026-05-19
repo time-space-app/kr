@@ -34,10 +34,10 @@
 - 다운로드 후 core 폴더내부의 파일 이름은 바꾸지 마세요. 타임스페이스 kr빌더를 관리자화면에서 최신 버전으로 업데이트 할 수 없게 됩니다.
 - 기본 사용자 이름/비밀번호: admin/admin@123 및 user/12345 입니다.(아래)
 - 암호를 변경 하려면 아래 방법을 사용하세요.
-[!WARNING]
-경고: 사용 전에 비밀번호를 직접 생성하십시오 PHP의 password_hash()로 암호를 생성하려면 [여기](https://tinyfilemanager.github.io/docs/pwd.html) 를 클릭하세요.
-[!WARNING]
-위 생성된 암호를 설정파일에서 사용하려면 [config.txt](https://github.com/time-space-app/kr/blob/v0.9/core/config.txt) 파일을 config.php 파일로 변경 후 admin과 user 암호를 입력합니다.(아래)
+> [!WARNING]
+> 경고: 사용 전에 비밀번호를 직접 생성하십시오 PHP의 password_hash()로 암호를 생성하려면 [여기](https://tinyfilemanager.github.io/docs/pwd.html) 를 클릭하세요.
+> [!WARNING]
+> 위 생성된 암호를 설정파일에서 사용하려면 [config.txt](https://github.com/time-space-app/kr/blob/v0.9/core/config.txt) 파일을 config.php 파일로 변경 후 admin과 user 암호를 입력합니다.(아래)
 ```
 $auth_users = array(
     'admin' => '$2y$10$/K.hjNr84lLNDt8fTXjoI.DBp6PpeyoJ.mGwrrLuCZfAwfSAGqhOW', //admin@123
