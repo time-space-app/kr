@@ -36,7 +36,6 @@
 - 암호를 변경 하려면 아래 방법을 사용하세요.
 > [!WARNING]
 > 경고: 사용 전에 비밀번호를 직접 생성하십시오 PHP의 password_hash()로 암호를 생성하려면 [여기](https://tinyfilemanager.github.io/docs/pwd.html) 를 클릭하세요.
-> [!WARNING]
 > 위 생성된 암호를 설정파일에서 사용하려면 [config.txt](https://github.com/time-space-app/kr/blob/v0.9/core/config.txt) 파일을 config.php 파일로 변경 후 admin과 user 암호를 입력합니다.(아래)
 ```
 $auth_users = array(
