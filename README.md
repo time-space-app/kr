@@ -43,8 +43,9 @@ $auth_users = array(
     'user' => '$2y$10$Fg6Dz8oH9fPoZ2jJan5tZuv6Z4Kp7avtQ9bDfrdRntXtPeiMAZyGO' //12345
 );
 ```
-- DB접속 정보를 변경 하려면 아래 방법을 사용하세요
-:information_source: DB 설정파일을 사용하려면 [env.txt](https://github.com/time-space-app/kr/blob/v0.9/core/env.txt) 파일을 env.php 파일로 변경 후 접속정보와 AIP키를 입력합니다.(아래)
+> [!WARNING]
+> DB접속 정보를 변경 하려면 아래 방법을 사용하세요
+> DB 설정파일을 사용하려면 [env.txt](https://github.com/time-space-app/kr/blob/v0.9/core/env.txt) 파일을 env.php 파일로 변경 후 접속정보와 AIP키를 입력합니다.(아래)
 ```
 <?php
 //본인의 정보를 이곳에 입력 후 파일명을 env.php로 수정하면 됩니다.
