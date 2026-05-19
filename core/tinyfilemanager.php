@@ -5040,9 +5040,9 @@ function fm_show_header_login()
             function edit_save(e, t) {
 				try {
 					// 에러가 발생할 가능성이 있는 코드 (예: 정의되지 않은 변수 사용) kimilguk
-					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header.php'; ?>" ?>";
-					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer.php'; ?>" ?>";
-					<?php if(FM_THEME=="dark") { ?>
+					<?php if(FM_THEME=="dark") { ?> //뉴스레터 메인페이지 디자인 용
+					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header-news-letter.php'; ?>" ?>";
+					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer-news-letter.php'; ?>" ?>";
 					if (oEditors) {
 						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
 						var _data = document.getElementById("normal-editor").value;
@@ -5055,7 +5055,9 @@ function fm_show_header_login()
 						}
 						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
 					}
-					<?php }else{ ?>
+					<?php }else{ ?> //게시판,지도 연동 메인페이지 디자인 용
+					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header.php'; ?>" ?>";
+					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer.php'; ?>" ?>";
 					var _editor = CKEDITOR.instances['normal-editor'];
 					if (_editor) {
 						var _data = _editor.getData();
