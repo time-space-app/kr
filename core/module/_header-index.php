@@ -1,3 +1,18 @@
+<?php session_start(); ?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width">
+    <title>홈페이지에 오신것을 환영합니다.</title>
+    <!-- 몽9에디터 설치 kimilguk -->
+    <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/etc/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9-base.css">
+    <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9.css">
+    <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9-m.css" media="all and (max-width: 768px)">
+    <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
+  </head>
+  <body>
 <!-- 게시판 모듈 시작 -->
     <script src="https://code.jquery.com/jquery-latest.js"></script>
     <style>
@@ -138,7 +153,7 @@
 	function downloadFile(file_save_name) {
 			// 1. 임시 a 태그 생성
 			const link = document.createElement('a');
-			link.href = `core/file-download.php?file_save_name=${encodeURIComponent(file_save_name)}`;
+			link.href = `/core/util/file-download.php?file_save_name=${encodeURIComponent(file_save_name)}`;
 			link.download = file_save_name; // 다운로드될 파일명 지정
 			// 2. 화면에 숨겨서 추가 (필수)
 			link.style.display = 'none';
@@ -156,7 +171,7 @@
             var formData = new FormData($('#editForm')[0]);
             formData.append('mode', 'delete');
             $.ajax({
-                url: '/core/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/board-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -175,7 +190,7 @@
             var formData = new FormData($('#editForm')[0]);
             formData.append('mode', 'edit');
             $.ajax({
-                url: '/core/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/board-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -194,7 +209,7 @@
             var formData = new FormData($('#boardForm')[0]);
             formData.append('mode', 'insert');
             $.ajax({
-                url: '/core/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/board-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -223,7 +238,7 @@
             if(page_location=='prev') numberValue--;
             if(page_location=='next') numberValue++;
             $.ajax({
-                url: '/core/board-api.php', // 서버 목록 API 주소
+                url: '/core/api/board-api.php', // 서버 목록 API 주소
                 type: 'GET',
                 data: { 
                     page: numberValue, 
@@ -279,7 +294,7 @@
             var boardId = $('#popup-title').attr('data-id');
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/board-api.php",
+                url: "/core/api/board-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {
@@ -309,7 +324,7 @@
             var boardId = $(this).data('id');
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/board-api.php",
+                url: "/core/api/board-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {
@@ -341,7 +356,7 @@
             var boardId = $('#editForm #id').val();
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/board-api.php",
+                url: "/core/api/board-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {

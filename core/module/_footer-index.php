@@ -220,5 +220,7 @@
 
     }
     </script>
-    <script src="/core/proxy.php?callback=google_map" async defer></script>
+    <script src="/core/util/proxy.php?callback=google_map" async defer></script>
 <!-- 지도 모듈 끝 -->
+    </body>
+</html>

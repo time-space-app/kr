@@ -2,7 +2,7 @@
 //kimilguk
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['pwd'] ?? '';
-    // °á°ú ¹ÝÈ¯ (JSON µî)
+    // ê²°ê³¼ ë°˜í™˜ (JSON ë“±)
     if (!empty($password)) {
 		// Generate secure hash (BCrypt default)
 		$hash = password_hash($password, PASSWORD_DEFAULT);

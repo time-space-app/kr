@@ -1,5 +1,6 @@
 <?php
 session_start();
+include_once __DIR__.'/secure-api.php';
 try {
 	header('Content-Type: application/json'); // JSON 응답 설정
 	$mode = $_POST['mode'] ?? ''; //입력, 수정, 삭제
@@ -8,7 +9,7 @@ try {
 	//exit;
 	$response = ['result' => 'fail', 'message' => '알 수 없는 오류'];
     // 설정 파일 불러오기
-    $env = include_once __DIR__ . '/env.php';
+    $env = include_once dirname(__DIR__) . '/env.php';
     // 클라우드 서버변수인 $_ENV를 사용하고, 없다면 로컬 서버변수를 사용(아래)
     $servername = $_ENV['DB_HOST'] ?? $env['DB_HOST'];
     $username = $_ENV['DB_USER'] ?? $env['DB_USER'];
@@ -143,6 +144,13 @@ try {
 				$stmt->execute();
 				$result = $stmt->get_result();
 				$row = $result->fetch_assoc();
+				// 모든 배열 값의 HTML 태그 변환 (XSS 방지)
+				array_walk_recursive($row, function (&$value) {
+					// 문자열 타입인 경우에만 htmlspecialchars 적용
+					if (is_string($value)) {
+						$value = safeHtmlOutput($value);
+					}
+				});
 				$response = ['result' => $row, 'message' => '글이 로드되었습니다.'];
 				$sql = "UPDATE board SET view_count = view_count + 1 WHERE id = ?";
 				$stmt = $conn->prepare($sql);
@@ -199,6 +207,13 @@ try {
 			$posts = array();
 			if ($result->num_rows > 0) {
 				while($row = $result->fetch_assoc()) {
+					// 모든 배열 값의 HTML 태그 변환 (XSS 방지)
+					array_walk_recursive($row, function (&$value) {
+						// 문자열 타입인 경우에만 htmlspecialchars 적용
+						if (is_string($value)) {
+							$value = safeHtmlOutput($value);
+						}
+					});
 					$posts[] = $row;
 				}
 				$response = ['result' => $posts, 'message' => '글이 로드되었습니다.', 'page' => $page];

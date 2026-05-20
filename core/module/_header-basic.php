@@ -13,4 +13,3 @@
     <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
   </head>
   <body>
-<?php include_once __DIR__.'/_header-module.php'; ?>

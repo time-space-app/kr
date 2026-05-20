@@ -1,4 +1,4 @@
-<?php include_once __DIR__.'/core/_header.php'; ?>
+<?php include_once __DIR__.'/core/module/_header-index.php'; ?>
 <!--//Mong9 Editor//--><!--//m9_font_family()//-->
 <div class="m9-grid-block">
 <div class="m9-grid-1">
@@ -122,4 +122,4 @@
 </div>
 </div>
 
-<?php include_once __DIR__.'/core/_footer.php'; ?>
+<?php include_once __DIR__.'/core/module/_footer-index.php'; ?>

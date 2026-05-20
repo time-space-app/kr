@@ -1634,12 +1634,17 @@ if (isset($_GET['settings']) && !FM_READONLY) {
                                 <option value='light' <?php if ($theme == "light") {
                                                             echo "selected";
                                                         } ?>>
-                                    <?php echo lng('light') ?>
+                                    <?php echo '게시판(CK에디터 사용)';//lng('light') ?>
+                                </option>
+                                <option value='basic' <?php if ($theme == "basic") {
+                                                            echo "selected";
+                                                        } ?>>
+                                    <?php echo '기본디자인(CK에디터 사용)';//echo lng('light') ?>
                                 </option>
                                 <option value='dark' <?php if ($theme == "dark") {
                                                             echo "selected";
                                                         } ?>>
-                                    <?php echo lng('dark') ?>
+                                    <?php echo '뉴스레터(스마트에디터 사용)';//lng('dark') ?>
                                 </option>
                             </select>
                         </div>
@@ -2016,7 +2021,7 @@ if (isset($_GET['edit']) && !FM_READONLY) {
         <?php
         if ($is_text && $isNormalEditor) {
 		?>
-		<!-- 몽9에디터 설치 kimilguk -->
+		<!-- 몽9에디터 설치 kimilguk 조건 2개 중 기본은 light 테마로 CK에디터사용 -->
 		<?php if(FM_THEME=="dark") { ?>
 			<script>
 			if (!M9_SET) { var M9_SET = {}; }
@@ -2094,7 +2099,7 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 				var lines = data.split('\n');
 				// 첫 번째 줄(0)과 마지막 줄(length-1) 제거
 				if (lines.length >= 2) {
-					lines.splice(0, 1); // 첫 줄 제거
+					lines.splice(0, 0); // 첫 줄 제거
 					lines.splice(lines.length - 1, 1); // 마지막 줄 제거
 				}
 				// 처리된 데이터를 다시 설정 (공백 제거)
@@ -3879,13 +3884,13 @@ function fm_show_nav_path($path)
 							}
 						</style>
 						<li class="nav-item">
-                            <a title="<?php echo lng('CoreUpdate') ?>" class="nav-link" href="core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUpdate') ?><span class="new-tag">new</span></a>
+                            <a title="<?php echo lng('CoreUpdate') ?>" class="nav-link" href="/core/core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUpdate') ?><span class="new-tag">new</span></a>
                         </li>
 						<script src="https://code.jquery.com/jquery-latest.js"></script>
 						<script>
 							$.ajax({
 							type: "POST",
-							url: "core-update.php",
+							url: "/core/util/core-update.php",
 							data: {
 								core_check: "core_check"
 							},
@@ -3912,8 +3917,8 @@ function fm_show_nav_path($path)
                             <div class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="navbarDropdownMenuLink-5" data-bs-theme="<?php echo FM_THEME; ?>">
                                 <?php if (!FM_READONLY): ?>
                                     <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
-                                    <a title="<?php echo lng('PhpInfo') ?>" class="dropdown-item nav-link" href="/core/phpinfo.php" target="_blank"><i class="fa fa-file" aria-hidden="true"></i> <?php echo lng('PhpInfo') ?></a>
-                                    <a title="<?php echo lng('DBAdminer') ?>" class="dropdown-item nav-link" href="/core/adminer.php" target="_blank"><i class="fa fa-database" aria-hidden="true"></i> <?php echo lng('DBAdminer') ?></a>
+                                    <a title="<?php echo lng('PhpInfo') ?>" class="dropdown-item nav-link" href="/core/util/phpinfo.php" target="_blank"><i class="fa fa-file" aria-hidden="true"></i> <?php echo lng('PhpInfo') ?></a>
+                                    <a title="<?php echo lng('DBAdminer') ?>" class="dropdown-item nav-link" href="/core/util/adminer.php" target="_blank"><i class="fa fa-database" aria-hidden="true"></i> <?php echo lng('DBAdminer') ?></a>
                                 <?php endif ?>
                                     <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
                                     <a title="<?php echo lng('Logout') ?>" class="dropdown-item nav-link" href="?logout=1"><i class="fa fa-sign-out" aria-hidden="true"></i> <?php echo lng('Logout') ?></a>
@@ -5041,35 +5046,50 @@ function fm_show_header_login()
 				try {
 					// 에러가 발생할 가능성이 있는 코드 (예: 정의되지 않은 변수 사용) kimilguk
 					<?php if(FM_THEME=="dark") { ?> //뉴스레터 메인페이지 디자인 용
-					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header-news-letter.php'; ?>" ?>";
-					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer-news-letter.php'; ?>" ?>";
-					if (oEditors) {
-						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
-						var _data = document.getElementById("normal-editor").value;
-						if(!_data.includes("include_once")){ //최초 1회 저장시
-							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_header+"\n"+_data+"\n"+_footer]);
-						}else{ //두번째 저장 부터는 아래 실행
-							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
-							var _data = str.replaceAll("?-->", "?>");
-							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_data]);
-						}
-						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
-					}
-					<?php }else{ ?> //게시판,지도 연동 메인페이지 디자인 용
-					var _header = "<?php echo "<?php include_once __DIR__.'/core/_header.php'; ?>" ?>";
-					var _footer = "<?php echo "<?php include_once __DIR__.'/core/_footer.php'; ?>" ?>";
-					var _editor = CKEDITOR.instances['normal-editor'];
-					if (_editor) {
-						var _data = _editor.getData();
-						if(!_data.includes("include_once")){ //최초 1회 저장시
-							_editor.setData(_header+"\n"+_data+"\n"+_footer);
-						}else{ //두번째 저장 부터는 아래 실행
-							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
-							var _data = str.replaceAll("?-->", "?>");
-							_editor.setData(_data);
-						}
-						_editor.updateElement();
-					}
+    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-news-letter.php'; ?>" ?>";
+    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-news-letter.php'; ?>" ?>";
+    					if (oEditors) {
+    						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
+    						var _data = document.getElementById("normal-editor").value;
+    						if(!_data.includes("include_once")){ //최초 1회 저장시
+    							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_header+"\n"+_data+"\n"+_footer]);
+    						}else{ //두번째 저장 부터는 아래 실행
+    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
+    							var _data = str.replaceAll("?-->", "?>");
+    							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_data]);
+    						}
+    						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
+    					}
+					<?php }elseif(FM_THEME=="light"){ ?> //게시판,지도 연동 메인페이지 디자인 용
+    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-index.php'; ?>" ?>";
+    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-index.php'; ?>" ?>";
+    					var _editor = CKEDITOR.instances['normal-editor'];
+    					if (_editor) {
+    						var _data = _editor.getData();
+    						if(!_data.includes("include_once")){ //최초 1회 저장시
+    							_editor.setData(_header+"\n"+_data+"\n"+_footer);
+    						}else{ //두번째 저장 부터는 아래 실행
+    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
+    							var _data = str.replaceAll("?-->", "?>");
+    							_editor.setData(_data);
+    						}
+    						_editor.updateElement();
+    					}
+					<?php }else{ ?> //기본 메인페이지 디자인 용
+    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-basic.php'; ?>" ?>";
+    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-basic.php'; ?>" ?>";
+    					var _editor = CKEDITOR.instances['normal-editor'];
+    					if (_editor) {
+    						var _data = _editor.getData();
+    						if(!_data.includes("include_once")){ //최초 1회 저장시
+    							_editor.setData(_header+"\n"+_data+"\n"+_footer);
+    						}else{ //두번째 저장 부터는 아래 실행
+    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
+    							var _data = str.replaceAll("?-->", "?>");
+    							_editor.setData(_data);
+    						}
+    						_editor.updateElement();
+    					}
 					<?php } ?>
 				} catch (e) {
 					// 에러를 무시하고 넘어가거나, 콘솔에만 표시 kimilguk

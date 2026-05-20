@@ -1,6 +1,6 @@
 <?php
 // 설정 파일 불러오기
-$env = include_once __DIR__ . '/env.php';
+$env = include_once dirname(__DIR__) . '/env.php';
 // 1. 설정 및 검증
 $uploadDir = $_ENV['UPLOAD_DIR'] ?? $env['UPLOAD_DIR']; // 첨부파일 경로 설정
 $fileName = $_GET['file_save_name']; // 첨부파일 경로+다운로드할 파일명
