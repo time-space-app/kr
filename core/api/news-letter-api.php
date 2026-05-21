@@ -199,8 +199,8 @@ try {
 			$keyword = $_GET['search'] ?? ''; // 사용자 입력 검색어
 			$page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 현재 페이지 번호 가져오기 (기본값 1)
 			if ($page < 1) $page = 1;
-			$itemsPerPage = 4; // 한 페이지에 보여줄 개수
-			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 4
+			$itemsPerPage = 3; // 한 페이지에 보여줄 개수
+			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 3
 			$sql = "SELECT * FROM news_letter WHERE title LIKE ? ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
 			$stmt = $conn->prepare($sql);
 			$search_param = "%" . $keyword . "%";

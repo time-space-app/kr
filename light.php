@@ -1,4 +1,4 @@
-<?php include_once __DIR__.'/core/module/_header-basic.php'; ?>
+<?php include_once __DIR__.'/core/theme/light/_header.php'; ?>
 <!--//Mong9 Editor//-->
 <div class="m9-grid-block">
 <div class="m9-grid-1">
@@ -7,7 +7,7 @@
 <div class="display-inline-block float-right m9-margin-width-2 text-align-center m-m9-margin-right-0 e-display-block e-float-none e-m9-margin-height-1 e-m9-margin-left-0"><span class="_aspectRatio m9-circle m9-fullimg m9-img-box overflow-hidden" style="width:160px"><span style="padding-bottom:100%"><img alt="" alt_no="1" src="http://localhost/ckeditor/plugins/mong9-editor/source/img/example/example020.jpg" style="left:0%; min-width:100%; position:absolute; top:0%; width:100%" /></span></span></div>
 
 <div class="overflow-hidden">
-<h3 class="m9-h3 m9-margin-bottom-1 m9-font-family-2 e-text-align-center">제목글3(H3)</h3>
+<h3 class="m9-h3 m9-margin-bottom-1 m9-font-family-2 e-text-align-center">제목글3(H3).</h3>
 
 <div class="m9-margin-bottom-1 after-clear-both">
 <ol class="m9-list-style-1 m9-float-2 after-clear-both m-m9-float-1">
@@ -61,4 +61,4 @@
 </div>
 </div>
 
-<?php include_once __DIR__.'/core/module/_footer-basic.php'; ?>
+<?php include_once __DIR__.'/core/theme/light/_footer.php'; ?>

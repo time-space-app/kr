@@ -13,8 +13,40 @@
     <link rel="stylesheet" href="/ckeditor/plugins/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
   </head>
   <body>
-<!-- 게시판 모듈 시작 -->
+<!-- 뉴스레터 모듈 시작 -->
     <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <!-- 스마트에디터2용 페이지에 삽입할 소스 kimilguk 
+    <script>
+	if (!M9_SET) { var M9_SET = {}; }
+	M9_SET['mong9_editor_use'] = '1'; // Mong9 에디터 사용
+	M9_SET['mong9_url'] = '/smarteditor2/mong9-editor/'; // 몽9 에디터 주소
+	M9_SET["google_token"] = "주의 여기에 입력하지 말고 _footer.php의 api/js?key=부분에 입력한다."; // 구글지도데모키사용(https://mapsplatform.google.com/intl/ko_kr/maps-demo-key/)
+	</script>
+	<script src="/smarteditor2/mong9-editor/source/js/mong9.js"></script>
+	<link rel="stylesheet" href="./smarteditor2/mong9-editor/source/etc/bootstrap-icons/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="./smarteditor2/mong9-editor/source/css/mong9-base.css">
+	<link rel="stylesheet" href="./smarteditor2/mong9-editor/source/css/mong9.css">
+	<link rel="stylesheet" href="./smarteditor2/mong9-editor/source/css/mong9-m.css" media="all and (max-width: 768px)">
+	<link rel="stylesheet" href="./smarteditor2/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
+	<script src="./smarteditor2/js/service/HuskyEZCreator.js"></script>
+	<script src="./smarteditor2/js/smarteditor2.js"></script>
+	<script src="./smarteditor2/mong9-editor/source/js/mong9-connect.js"></script>
+	-->
+	<!-- CK에디터용 페이지에 삽입할 소스 kimilguk -->
+	<script>
+	if (!M9_SET) { var M9_SET = {}; }
+	M9_SET['mong9_editor_use'] = '1'; // Mong9 에디터 사용
+	M9_SET['mong9_url'] = '/ckeditor/plugins/mong9-editor/'; // 몽9 에디터 주소
+	M9_SET["google_token"] = "주의 여기에 입력하지 말고 _footer.php의 api/js?key=부분에 입력한다."; // 구글지도데모키사용(https://mapsplatform.google.com/intl/ko_kr/maps-demo-key/)
+	</script>
+	<script src="/ckeditor/plugins/mong9-editor/source/js/mong9.js"></script>
+	<link rel="stylesheet" href="./ckeditor/plugins/mong9-editor/source/etc/bootstrap-icons/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="./ckeditor/plugins/mong9-editor/source/css/mong9-base.css">
+	<link rel="stylesheet" href="./ckeditor/plugins/mong9-editor/source/css/mong9.css">
+	<link rel="stylesheet" href="./ckeditor/plugins/mong9-editor/source/css/mong9-m.css" media="all and (max-width: 768px)">
+	<link rel="stylesheet" href="./ckeditor/plugins/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
+	<script src="./ckeditor/ckeditor.js"></script>
+	<script src="./ckeditor/plugins/mong9-editor/source/js/mong9-connect.js"></script>
     <style>
         /* 기본 스타일 */
         .board-container {margin: 0 auto; padding: 20px; }
@@ -66,7 +98,7 @@
         .view-title { margin: 0 0 10px 0; font-size: 24px; }
         .view-info { font-size: 14px; color: #777; }
         .view-info span { margin-right: 15px; }
-        .view-content { min-height: 200px; line-height: 1.6; font-size: 16px;}
+        .view-content { min-height: 200px; line-height: 1.6; font-size: 12px;}
         .view-actions { text-align: right; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -148,6 +180,7 @@
             .btn { width: auto; } /* 데스크톱에서는 버튼 크기 자동 */
             .popup-body { max-height: 50vh; }
         }
+        .no-data { text-align:center; }
     </style>
     <script>
 	function downloadFile(file_save_name) {
@@ -171,7 +204,7 @@
             var formData = new FormData($('#editForm')[0]);
             formData.append('mode', 'delete');
             $.ajax({
-                url: '/core/api/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/news-letter-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -179,7 +212,7 @@
                 success: function(data) {
                     alert(data.message);
                     $('#title').val('');
-                    $('#content').val('');
+                    $('#content-edit').val('');
                     loadList(); // 목록 새로고침
                     $('.layer-popup').hide();
                 }
@@ -187,10 +220,16 @@
         });
         $('.btn-edit').click(function(e) {
             e.preventDefault(); // 기본 폼 제출 막기
+            if (typeof oEditors !== 'undefined') {
+                oEditors.getById["content-edit"].exec("UPDATE_CONTENTS_FIELD", []);
+            }
+            if(typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['content-edit']) {
+                CKEDITOR.instances['content-edit'].updateElement();
+            }
             var formData = new FormData($('#editForm')[0]);
             formData.append('mode', 'edit');
             $.ajax({
-                url: '/core/api/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/news-letter-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -199,6 +238,13 @@
                     alert(data.message);
                     //$('#editForm')[0].reset();
                     loadList(); // 목록 새로고침
+                    document.getElementById("content-edit").value = "";
+                    if (typeof oEditors !== 'undefined') {
+        			    oEditors.getById["content-edit"].exec("UPDATE_CONTENTS_FIELD", []);
+                    }
+                    if(typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['content-edit']) {
+                        CKEDITOR.instances['content-edit'].updateElement();
+                    }
 					$('.view-item').trigger('click');
                     //$('.layer-popup').hide();
                 }
@@ -206,10 +252,16 @@
         });
         $('.btn-submit').click(function(e) {
             e.preventDefault(); // 기본 폼 제출 막기
+            if (typeof oEditors !== 'undefined') {
+			    oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+            }
+            if(typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['content']) {
+                CKEDITOR.instances['content'].updateElement();
+            }
             var formData = new FormData($('#boardForm')[0]);
             formData.append('mode', 'insert');
             $.ajax({
-                url: '/core/api/board-api.php', // 서버 저장 API 주소
+                url: '/core/api/news-letter-api.php', // 서버 저장 API 주소
                 type: 'POST',
                 data: formData,
                 contentType: false, // 필수: multipart/form-data 설정
@@ -218,6 +270,7 @@
                     alert(data.message);
                     $('#boardForm')[0].reset();
                     loadList(); // 목록 새로고침
+                    document.getElementById("content").value = "";
                     $('.layer-popup').hide();
                 }
             });
@@ -234,35 +287,85 @@
                 <?php } ?>
                 pagination += '</div>';
             $('.pagination').remove();
-            $("[class^='m9-list-style-']").after(pagination);
+            $("[class^='m9-float-']").after(pagination);
             if(page_location=='prev') numberValue--;
             if(page_location=='next') numberValue++;
+            // 현재 URL의 쿼리 스트링 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            // 특정 파라미터 값 가져오기 (예: ?id=123 인 경우)
+            const mySearch = urlParams.get('search');
             $.ajax({
-                url: '/core/api/board-api.php', // 서버 목록 API 주소
+                url: '/core/api/news-letter-api.php', // 서버 목록 API 주소
                 type: 'GET',
                 data: { 
                     page: numberValue, 
+                    search: mySearch,
                     mode: "list" 
                 },
                 success: function(data) {
                     let html = '';
+                    //alert(data.message);
                     // 데이터 수만큼 반복하여 테이블 row 생성
-                    $.each(data.result, function(index, item) {
-						if ($("[class^='m9-list-style-'] li").hasClass('display-inline-block')) {
-							html += '<li class="float-left display-inline-block e-float-none e-display-block m9-margin-right-1 e-m9-margin-right-0 list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
-						}else{
-							html += '<li class="list-item" style="cursor:pointer" data-id="' + item.id + '">'+item.title+'</li>';
-						}
-                    });
+                    if(data.result.length>0) {
+                        $.each(data.result, function(index, item) {
+                            var $dom = $("<div>").html(item.content);
+                            var imgSrcArray = $dom.find("img").map(function() {
+                                return $(this).attr("src");
+                            }).get();
+                            if (typeof imgSrcArray[0] === 'undefined') {
+                                var extractedText = $dom.find("p").text();
+                                var text = extractedText.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9 ]/g, "");
+                                var subtext = text.substring(2, 60) + '...';;
+                                html +=  `
+        						    <li class="list-item" style="cursor:pointer" data-id="${item.id}">
+        						    <div>
+        						    <div class="text-align-center m9-margin-bottom-1">
+        						    <span class="m9-fullimg m9-img-box" data-m9-m-style="width:100%">
+        						    <span style="padding-bottom:66.5635%">
+        						    <img alt="" alt_no="1" data-m9-m-style="width:100%" src="/ckeditor/plugins/mong9-editor/source/img/example/example014.jpg" style="left:0%; min-width:100%; position:absolute; top:0%; width:100%">
+        						    </span>
+        						    </span>
+        						    </div>
+        						    <h3 class="m9-h3 m9-margin-bottom-1 m9-padding-bottom-0 text-align-center">${item.title}</h3>
+        						    <p class="text-align-center m9-margin-bottom-1" style="min-width:28vw">${subtext}</p>
+        						    </div>
+        						    </li>
+        						 `;
+                            }else{
+                                const cleanUrl = imgSrcArray[0].replace(/[^a-zA-Z0-9:/.-]/g, '');
+                                var extractedText = $dom.find("p").text();
+                                var text = extractedText.replace(/[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9 ]/g, "");
+                                var subtext = text.substring(2, 60) + '...';;
+        						html +=  `
+        						    <li class="list-item" style="cursor:pointer" data-id="${item.id}">
+        						    <div>
+        						    <div class="text-align-center m9-margin-bottom-1">
+        						    <span class="m9-fullimg m9-img-box" data-m9-m-style="width:100%">
+        						    <span style="padding-bottom:66.5635%">
+        						    <img alt="" alt_no="1" data-m9-m-style="width:100%" src="${cleanUrl}" style="left:0%; min-width:100%; position:absolute; top:0%; width:100%">
+        						    </span>
+        						    </span>
+        						    </div>
+        						    <h3 class="m9-h3 m9-margin-bottom-1 m9-padding-bottom-0 text-align-center">${item.title}</h3>
+        						    <p class="text-align-center m9-margin-bottom-1" style="min-width:28vw">${subtext}</p>
+        						    </div>
+        						    </li>
+        						 `;
+                            }
+                        });
+                    }
                     if(data.result.length>0) {
                         $('.pagination').attr("style", "display:flex;");
                         $('.pagination').show();
                         document.getElementById('page').innerText = data.page;
-						$("[class^='m9-list-style-']").html(html);
+						$("[class^='m9-float-']").html(html);
+						$("div.no-data").remove();
                     }else{
                         $('.pagination').attr("style", "display:flex;");
                         $('.pagination').show();
                         document.getElementById('page').innerText = data.page-1;
+                        $("div.no-data").remove();
+                        $(".pagination").before('<div class="no-data">조회된 값이 없습니다.</div>');
                     }
                 }
             });
@@ -285,6 +388,15 @@
         $(document).on('click', '.btn-popup', function(e) {
             e.preventDefault();
             $('#boardForm')[0].reset();
+            document.getElementById("content").value = "";
+            if (typeof oEditors !== 'undefined') {
+                oEditors.getById["content"].exec("SET_CONTENTS", ['']);
+			    oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
+            }
+            if(typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['content']) {
+                CKEDITOR.instances['content'].setData('')
+                CKEDITOR.instances['content'].updateElement();
+            }
             $('#write-popup').show();
         });
         // 글수정창 보기 이벤트
@@ -294,7 +406,7 @@
             var boardId = $('#popup-title').attr('data-id');
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/api/board-api.php",
+                url: "/core/api/news-letter-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {
@@ -303,7 +415,14 @@
                     let response = data.result;
                     $('#editForm #title').val(response.title);
                     var content = response.content.replace(/\\r\\n/g, '\n');
-                    $('#editForm #content').val(content);
+                    if (typeof oEditors !== 'undefined') {
+                        oEditors.getById["content-edit"].exec("SET_IR", [content.replace(/\\/g, '')]);
+                    }
+                    if(typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['content-edit']) {
+                        CKEDITOR.instances['content-edit'].setData(content.replace(/\\/g, ''));
+                        CKEDITOR.instances['content-edit'].updateElement();
+                    }
+                    $('#editForm #content-edit').html(content.replace(/\\/g, ''));
                     $('#editForm #id').val(boardId);
 					if($('.download-real-file').length > 0) $('.download-real-file').remove();
 					if(response.file_name) {
@@ -313,7 +432,7 @@
 					$('.download-file').text('');
 					$('.download-real-file').remove();
 					}
-                    $('#edit-popup').show();
+					$('#edit-popup').show();
                 }
             });
         });
@@ -324,7 +443,7 @@
             var boardId = $(this).data('id');
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/api/board-api.php",
+                url: "/core/api/news-letter-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {
@@ -332,8 +451,8 @@
                     let response = data.result;
                     $("#popup-title").text(response.title);
                     $('#popup-title').attr('data-id', response.id);
-                    var content = response.content.replace(/\\r\\n/g, '<br>');
-                    $('#popup-body-content').html(content);
+                    var content = response.content.replace(/\\r\\n/g, '');
+                    $('#popup-body-content').html(content.replace(/\\/g, ''));
 					$('.view-writer').html(response.writer);
 					$('.view-count').html(response.view_count);
 					$('.view-reg_date').html(response.reg_date);
@@ -356,15 +475,15 @@
             var boardId = $('#editForm #id').val();
             // AJAX로 데이터 가져오기
             $.ajax({
-                url: "/core/api/board-api.php",
+                url: "/core/api/news-letter-api.php",
                 type: "POST",
                 data: { id: boardId, mode: "view" },
                 success: function(data) {
                     let response = data.result;
                     $("#popup-title").text(response.title);
                     $('#popup-title').attr('data-id', response.id);
-                    var content = response.content.replace(/\\r\\n/g, '<br>');
-                    $('#popup-body-content').html(content);
+                    var content = response.content.replace(/\\r\\n/g, '');
+                    $('#popup-body-content').html(content.replace(/\\/g, ''));
 					if($('.download-real-file').length > 0) $('.download-real-file').remove();
 					if(response.file_name) {
 					$('.download-file').text(response.file_name);
@@ -379,6 +498,56 @@
         });
     });
     </script>
+    <!-- 검색어 -->
+    <style>
+    /* 검색창 전체 컨테이너를 Flexbox로 설정 */
+    .search-container {
+        display: flex;
+        width: 100%;
+        max-width: 600px; /* 데스크톱에서 너무 길어지는 것을 방지 */
+        margin: 0 auto;
+    }
+    /* 검색 입력창: 빈 공간을 모두 차지하도록 설정 */
+    .search-container input {
+        flex: 1; /* 남은 공간을 채우며 유연하게 크기 변경 */
+        padding: 10px 15px;
+        font-size: 16px;
+        border: 2px solid #ccc;
+        border-right: none; /* 버튼과 맞닿는 부분 테두리 제거 */
+        border-radius: 4px 0 0 4px;
+        outline: none;
+    }
+    /* 입력창 포커스 시 테두리 색상 변경 */
+    .search-container input:focus {
+        border-color: #2563eb;
+    }
+    /* 검색 버튼: 크기 고정 */
+    .search-container button {
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #2563eb;
+        border: 2px solid #2563eb;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+    }
+    /* 모바일 등 작은 화면에서 디자인 조정 */
+    @media (max-width: 480px) {
+        .search-container input {
+            font-size: 14px;
+        }
+        .search-container button {
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+    }
+    </style>
+    <form class="search-container" action="" method="GET">
+        <input type="search" id="search" name="search" placeholder="검색어를 입력하세요.">
+        <button type="submit">검색</button>
+    </form>
+
     <!-- 내용보기 레이어 팝업 -->
     <div id="view-popup" class="layer-popup">
         <div class="popup-content">
@@ -420,8 +589,8 @@
                         <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required>
                     </div>
                     <div class="form-group">
-                        <label for="content">내용</label>
-                        <textarea id="content" name="content" placeholder="내용을 입력하세요" required></textarea>
+                        <label for="content-edit">내용</label>
+                        <textarea id="content-edit" name="content-edit" placeholder="내용을 입력하세요" required></textarea>
                     </div>
                     <div class="form-group">
                         <label for="upload_file">첨부파일</label>
@@ -469,4 +638,48 @@
             </div>
         </div>
     </div>
-<!-- 게시판 모듈 끝 -->
+    <!-- 스마트에디터2용 kimilguk 
+    <script>
+        $('#write-popup').show();
+        $('#edit-popup').show();
+    	var oEditors = [];
+    	nhn.husky.EZCreator.createInIFrame({
+    		oAppRef: oEditors,
+    		elPlaceHolder: "content",
+    		sSkinURI: "/smarteditor2/SmartEditor2Skin_ko_KR.html",
+    		fCreator: "createSEditor2",
+    		fOnAppLoad: function() {
+                $('#write-popup').hide();
+            }
+    	});
+    	nhn.husky.EZCreator.createInIFrame({
+    		oAppRef: oEditors,
+    		elPlaceHolder: "content-edit",
+    		sSkinURI: "/smarteditor2/SmartEditor2Skin_ko_KR.html",
+    		fCreator: "createSEditor2",
+    		fOnAppLoad: function() {
+                $('#edit-popup').hide();
+            }
+    	});
+	</script>
+	-->
+	<!-- CK에디터용 kimilguk --> 
+    <script>
+        CKEDITOR.replace('content', {
+            versionCheck: false
+        });
+    	CKEDITOR.replace('content-edit', {
+            versionCheck: false
+        });
+		CKEDITOR.config.allowedContent = {
+			$1: {
+				elements: CKEDITOR.dtd,
+				attributes: true,
+				styles: true,
+				classes: true
+			}
+		};
+		CKEDITOR.config.disallowedContent = 'style;script; *[on*]';
+		CKEDITOR.config.height = 200;
+	</script>
+<!-- 뉴스레터 모듈 끝 -->

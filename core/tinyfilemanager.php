@@ -1628,35 +1628,39 @@ if (isset($_GET['settings']) && !FM_READONLY) {
                     </div>
 
                     <div class="mb-3 row">
-                        <label for="js-3-1" class="col-sm-3 col-form-label"><?php echo lng('Theme') ?></label>
+                        <label for="js-3-1" class="col-sm-3 col-form-label">
+						<?php echo lng('Theme') ?>
+						<br>예, light는 기능없이, index는 게시판기능, news-letter은 뉴스레터기능의 테마
+						</label>
                         <div class="col-sm-5">
-                            <select class="form-select w-100 text-capitalize" id="js-3-0" name="js-theme-3">
-                                <option value='light' <?php if ($theme == "light") {
-                                                            echo "selected";
-                                                        } ?>>
-                                    <?php echo '게시판(CK에디터 사용)';//lng('light') ?>
-                                </option>
-                                <option value='basic' <?php if ($theme == "basic") {
-                                                            echo "selected";
-                                                        } ?>>
-                                    <?php echo '기본디자인(CK에디터 사용)';//echo lng('light') ?>
-                                </option>
-                                <option value='dark' <?php if ($theme == "dark") {
-                                                            echo "selected";
-                                                        } ?>>
-                                    <?php echo '뉴스레터(스마트에디터 사용)';//lng('dark') ?>
-                                </option>
-                            </select>
+							<select class="form-select w-100" id="js-3-0" name="js-theme-3">
+							<?php
+							$target_dir = __DIR__ . '/theme'; //기준이 되는 폴더 경로
+							// 디렉토리 열기
+							if ($handle = opendir($target_dir)) {
+								while (false !== ($file = readdir($handle))) {
+									// . 및 .. 디렉토리 제외, 디렉토리만 필터링
+									if ($file != "." && $file != ".." && is_dir($target_dir . '/' . $file)) {
+										// 현재 선택된 폴더(GET 파라미터 등)가 있다면 selected 처리
+										$selected = ($theme == $file) ? 'selected' : '';
+										echo "<option value='{$file}' {$selected}>{$file}</option>";
+									}
+								}
+								closedir($handle);
+							}
+							?>
+						</select>
                         </div>
                     </div>
 
                     <div class="mb-3 row">
                         <div class="col-sm-10">
                             <button type="submit" class="btn btn-success"> <i class="fa fa-check-circle"></i> <?php echo lng('Save'); ?></button>
+							<!-- <button onclick="location.reload()" class="btn btn-outline-primary">새로고침</button> -->
                         </div>
                     </div>
 
-                    <small class="text-body-secondary">* <?php echo lng('Sometimes the save action may not work on the first try, so please attempt it again') ?>.</small>
+                    <small class="text-body-secondary">* <?php echo lng('Sometimes the save action may not work on the first try, so please attempt it again<br><strong>*(현재 페이지에서 사용할 테마저장 시 화면이 변하지 않을 수 있으니 2번 저장 하세요.)</strong>') ?>.</small>
                 </form>
             </div>
         </div>
@@ -1825,6 +1829,80 @@ if (isset($_GET['view'])) {
                 }
                 ?>
             </ul>
+			<style>
+			.hidden-div { visibility: hidden; position: absolute; }
+			</style>
+			<?php if ($is_text && !FM_READONLY) { ?>
+				<form id="js-settings-form" action="" method="post" data-type="ajax" onsubmit="return save_settings(this)">
+					<input type="hidden" name="type" value="settings" aria-label="hidden" aria-hidden="true">
+					<div class="form-group row hidden-div">
+						<label for="js-language" class="col-sm-3 col-form-label"><?php echo lng('Language') ?></label>
+						<div class="col-sm-5 hidden-div">
+							<select class="form-select" id="js-language" name="js-language">
+								<?php
+								function getSelected($l)
+								{
+									global $lang;
+									return ($lang == $l) ? 'selected' : '';
+								}
+								foreach ($lang_list as $k => $v) {
+									echo "<option value='$k' " . getSelected($k) . ">$v</option>";
+								}
+								?>
+							</select>
+						</div>
+					</div>
+					<div class="mt-3 mb-3 row hidden-div">
+						<label for="js-error-report" class="col-sm-3 col-form-label"><?php echo lng('ErrorReporting') ?></label>
+						<div class="col-sm-9">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" id="js-error-report" name="js-error-report" value="true" <?php echo $report_errors ? 'checked' : ''; ?> />
+							</div>
+						</div>
+					</div>
+					<div class="mb-3 row hidden-div">
+						<label for="js-show-hidden" class="col-sm-3 col-form-label"><?php echo lng('ShowHiddenFiles') ?></label>
+						<div class="col-sm-9">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" id="js-show-hidden" name="js-show-hidden" value="true" <?php echo $show_hidden_files ? 'checked' : ''; ?> />
+							</div>
+						</div>
+					</div>
+					<div class="mb-3 row hidden-div">
+						<label for="js-hide-cols" class="col-sm-3 col-form-label"><?php echo lng('HideColumns') ?></label>
+						<div class="col-sm-9">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" id="js-hide-cols" name="js-hide-cols" value="true" <?php echo $hide_Cols ? 'checked' : ''; ?> />
+							</div>
+						</div>
+					</div>
+					<div class="mb-3 row">
+						<label for="js-3-0" class="col-sm-3" style="width:auto;"><?php echo lng('Theme') ?></label>
+						<div class="col-sm-5">
+							<select class="form-select" style="width: auto;float: left;" id="js-3-0" name="js-theme-3">
+							<?php
+							$target_dir = __DIR__ . '/theme'; //기준이 되는 폴더 경로
+							// 디렉토리 열기
+							if ($handle = opendir($target_dir)) {
+								while (false !== ($file2 = readdir($handle))) {
+									// . 및 .. 디렉토리 제외, 디렉토리만 필터링
+									if ($file2 != "." && $file2 != ".." && is_dir($target_dir . '/' . $file2)) {
+										// 현재 선택된 폴더(GET 파라미터 등)가 있다면 selected 처리
+										$selected = ($theme == $file2) ? 'selected' : '';
+										echo "<option value='{$file2}' {$selected}>{$file2}</option>";
+									}
+								}
+								closedir($handle);
+							}
+							?>
+						</select>
+						<span style="font-size:12px;font-weight:bold;">*(디자인에디터에서 사용할 테마저장 시 화면이 변하지 않으니 꼭 2번 저장 하세요. 코어에디터에서는 사용할 필요없음.)</span>
+						<button type="submit" class="btn btn-success"> <i class="fa fa-check-circle"></i> <?php echo lng('Save'); ?></button>
+						<!-- <button onclick="location.reload()" class="btn btn-outline-primary">새로고침</button> -->
+						</div>
+					</div>
+				</form>
+			<?php } ?>
             <div class="btn-group btn-group-sm flex-wrap" role="group">
                 <form method="post" class="d-inline mb-0 btn btn-outline-primary" action="?p=<?php echo urlencode(FM_PATH) ?>&amp;dl=<?php echo urlencode($file) ?>">
                     <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
@@ -2021,8 +2099,8 @@ if (isset($_GET['edit']) && !FM_READONLY) {
         <?php
         if ($is_text && $isNormalEditor) {
 		?>
-		<!-- 몽9에디터 설치 kimilguk 조건 2개 중 기본은 light 테마로 CK에디터사용 -->
-		<?php if(FM_THEME=="dark") { ?>
+			<!-- 몽9에디터 설치 조건 2개 중 기본은 light 테마로 네이버 스마트에디터2 사용 kimilguk -->
+			<!-- 
 			<script>
 			if (!M9_SET) { var M9_SET = {}; }
 			M9_SET['mong9_editor_use'] = '1'; // Mong9 에디터 사용
@@ -2035,13 +2113,12 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 			<link rel="stylesheet" href="/smarteditor2/mong9-editor/source/css/mong9.css">
 			<link rel="stylesheet" href="/smarteditor2/mong9-editor/source/css/mong9-m.css" media="all and (max-width: 768px)">
 			<link rel="stylesheet" href="/smarteditor2/mong9-editor/source/css/mong9-e.css" media="all and (max-width: 576px)">
-			<!-- 에디터 페이지에 삽입할 소스 kimilguk -->
 			<script src="/smarteditor2/js/service/HuskyEZCreator.js"></script>
 			<script src="/smarteditor2/js/smarteditor2.js"></script>
 			<script src="/smarteditor2/mong9-editor/source/js/mong9-connect.js"></script>
 			<?php
-				echo '<textarea class="mt-2" id="normal-editor" rows="33" cols="120" style="width: 99.5%;">' . htmlspecialchars($content) . '</textarea>';
-				echo '<script>document.addEventListener("keydown", function(e) {if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) { e.preventDefault();edit_save(this,"nrl");}}, false);</script>';
+				//echo '<textarea class="mt-2" id="normal-editor" rows="33" cols="120" style="width: 99.5%;">' . htmlspecialchars($content) . '</textarea>';
+				//echo '<script>document.addEventListener("keydown", function(e) {if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) { e.preventDefault();edit_save(this,"nrl");}}, false);</script>';
 			?>
 			<script>
 			var oEditors = [];
@@ -2065,7 +2142,8 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 				}
 			});
 			</script>
-		<?php }else{ ?>
+			-->
+			<!-- 몽9에디터 설치 조건 2개 중 기본은 light 테마로 네이버 CK에디터 사용 kimilguk -->
 			<script>
 			if (!M9_SET) { var M9_SET = {}; }
 			M9_SET['mong9_editor_use'] = '1'; // Mong9 에디터 사용
@@ -2090,7 +2168,10 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 			// 1. 언어 선택(필요시) kimilguk
 			//CKEDITOR.config.language = 'ko';
 			// 2. Add editor
-			CKEDITOR.replace("normal-editor"); // textarea 의 ID
+			//CKEDITOR.replace("normal-editor"); //4.22.1은 무료이지만 버전체크가 뜨기 때문에 아래 코드추가
+			CKEDITOR.replace("normal-editor", {
+				versionCheck: false
+			});
 			// 저장 단계에서 처리 하도록 추가 하였음. kimilguk
 			CKEDITOR.instances['normal-editor'].on('instanceReady', function(e) {
 				var editor = e.editor;
@@ -2119,7 +2200,6 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 			CKEDITOR.config.disallowedContent = 'style;script; *[on*]';
 			CKEDITOR.config.height = 400;
 			</script>
-		<?php } ?>
 		<?php
         } elseif ($is_text) {
             echo '<div id="editor" contenteditable="true">' . htmlspecialchars($content) . '</div>';
@@ -5044,53 +5124,37 @@ function fm_show_header_login()
             // Save file
             function edit_save(e, t) {
 				try {
-					// 에러가 발생할 가능성이 있는 코드 (예: 정의되지 않은 변수 사용) kimilguk
-					<?php if(FM_THEME=="dark") { ?> //뉴스레터 메인페이지 디자인 용
-    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-news-letter.php'; ?>" ?>";
-    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-news-letter.php'; ?>" ?>";
-    					if (oEditors) {
-    						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
-    						var _data = document.getElementById("normal-editor").value;
-    						if(!_data.includes("include_once")){ //최초 1회 저장시
-    							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_header+"\n"+_data+"\n"+_footer]);
-    						}else{ //두번째 저장 부터는 아래 실행
-    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
-    							var _data = str.replaceAll("?-->", "?>");
-    							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_data]);
-    						}
-    						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
-    					}
-					<?php }elseif(FM_THEME=="light"){ ?> //게시판,지도 연동 메인페이지 디자인 용
-    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-index.php'; ?>" ?>";
-    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-index.php'; ?>" ?>";
-    					var _editor = CKEDITOR.instances['normal-editor'];
-    					if (_editor) {
-    						var _data = _editor.getData();
-    						if(!_data.includes("include_once")){ //최초 1회 저장시
-    							_editor.setData(_header+"\n"+_data+"\n"+_footer);
-    						}else{ //두번째 저장 부터는 아래 실행
-    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
-    							var _data = str.replaceAll("?-->", "?>");
-    							_editor.setData(_data);
-    						}
-    						_editor.updateElement();
-    					}
-					<?php }else{ ?> //기본 메인페이지 디자인 용
-    					var _header = "<?php echo "<?php include_once __DIR__.'/core/module/_header-basic.php'; ?>" ?>";
-    					var _footer = "<?php echo "<?php include_once __DIR__.'/core/module/_footer-basic.php'; ?>" ?>";
-    					var _editor = CKEDITOR.instances['normal-editor'];
-    					if (_editor) {
-    						var _data = _editor.getData();
-    						if(!_data.includes("include_once")){ //최초 1회 저장시
-    							_editor.setData(_header+"\n"+_data+"\n"+_footer);
-    						}else{ //두번째 저장 부터는 아래 실행
-    							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
-    							var _data = str.replaceAll("?-->", "?>");
-    							_editor.setData(_data);
-    						}
-    						_editor.updateElement();
-    					}
-					<?php } ?>
+					// 네이버 스마트에디터2 사용시 kimilguk
+					/*
+					var _header = "<?php echo "<?php include_once __DIR__.'/core/theme/".FM_THEME."/_header.php'; ?>" ?>";
+					var _footer = "<?php echo "<?php include_once __DIR__.'/core/theme/".FM_THEME."/_footer.php'; ?>" ?>";
+					if (oEditors) {
+						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
+						var _data = document.getElementById("normal-editor").value;
+						if(!_data.includes("include_once")){ //최초 1회 저장시
+							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_header+"\n"+_data+"\n"+_footer]);
+						}else{ //두번째 저장 부터는 아래 실행
+							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
+							var _data = str.replaceAll("?-->", "?>");
+							oEditors.getById["normal-editor"].exec("SET_CONTENTS", [_data]);
+						}
+						oEditors.getById["normal-editor"].exec("UPDATE_CONTENTS_FIELD", []);
+					}
+					*/
+					var _header = "<?php echo "<?php include_once __DIR__.'/core/theme/".FM_THEME."/_header.php'; ?>" ?>";
+					var _footer = "<?php echo "<?php include_once __DIR__.'/core/theme/".FM_THEME."/_footer.php'; ?>" ?>";
+					var _editor = CKEDITOR.instances['normal-editor'];
+					if (_editor) {
+						var _data = _editor.getData();
+						if(!_data.includes("include_once")){ //최초 1회 저장시
+							_editor.setData(_header+"\n"+_data+"\n"+_footer);
+						}else{ //두번째 저장 부터는 아래 실행
+							var _data = str.replaceAll("<!--?php", "<?php echo '<?php';?>");
+							var _data = str.replaceAll("?-->", "?>");
+							_editor.setData(_data);
+						}
+						_editor.updateElement();
+					}
 				} catch (e) {
 					// 에러를 무시하고 넘어가거나, 콘솔에만 표시 kimilguk
 					console.error("에러 발생 건너뜀:", e.message);
