@@ -40,7 +40,7 @@ if ($remote_info['version'] > $local_version) {
 		
 		// extractTo(대상경로, 파일들, 덮어쓰기여부)
 		// 덮어쓰기를 위해 세 번째 인자를 true로 설정
-		$phar->extractTo(__DIR__, null, true); 
+		$phar->extractTo(dirname(__DIR__), null, true); 
 		
 		echo "Update Success! (Updated version: " . $remote_info['version'] . ")<br>";
 		echo "<a href='tinyfilemanager.php'>To main screen</a>";
