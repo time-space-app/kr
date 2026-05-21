@@ -43,7 +43,7 @@ if ($remote_info['version'] > $local_version) {
 		$phar->extractTo(dirname(__DIR__), null, true); 
 		
 		echo "Update Success(업데이트 성공)! (기존 ".$local_version." 버전에서 -> " . $remote_info['version'] . " 버전으로 업데이트됨.)<br>";
-		echo "<a href='tinyfilemanager.php'>관리자 페이지로 이동</a>";
+		echo "<a href='/core/tinyfilemanager.php'>관리자 페이지로 이동</a>";
 		// 3. 압축 파일 삭제
 		unlink($tar_file);
 

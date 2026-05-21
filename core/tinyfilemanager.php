@@ -3964,7 +3964,7 @@ function fm_show_nav_path($path)
 							}
 						</style>
 						<li class="nav-item">
-                            <a title="<?php echo lng('CoreUpdate') ?>" class="nav-link" href="/core/util/core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUpdate') ?><span class="new-tag">new</span></a>
+                            <a title="<?php echo lng('CoreUpdate') ?>" class="nav-link" href="/core/util/core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version(코어 폴더의 소스 코드를 최신 버전으로 업데이트하시겠습니까)?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUpdate') ?><span class="new-tag">new</span></a>
                         </li>
 						<script src="https://code.jquery.com/jquery-latest.js"></script>
 						<script>
