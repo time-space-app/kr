@@ -42,17 +42,17 @@ if ($remote_info['version'] > $local_version) {
 		// 덮어쓰기를 위해 세 번째 인자를 true로 설정
 		$phar->extractTo(dirname(__DIR__), null, true); 
 		
-		echo "Update Success! (Updated version: " . $remote_info['version'] . ")<br>";
-		echo "<a href='tinyfilemanager.php'>To main screen</a>";
+		echo "Update Success(업데이트 성공)! (기존 ".$local_version." 버전에서 -> " . $remote_info['version'] . " 버전으로 업데이트됨.)<br>";
+		echo "<a href='tinyfilemanager.php'>관리자 페이지로 이동</a>";
 		// 3. 압축 파일 삭제
 		unlink($tar_file);
 
 	} catch (Exception $e) {
-		echo "Failed to extract update file: " . $e->getMessage() . "<br>";
-		echo "<a href='tinyfilemanager.php'>To main screen</a>";
+		echo "Failed to extract update file(업데이트 파일 추출에 실패했습니다.): " . $e->getMessage() . "<br>";
+		echo "<a href='/core/tinyfilemanager.php'>관리자 페이지로 이동</a>";
 	}
 } else {
-    echo "It is currently the latest version, so it will not be updated.(Current version: " . $local_version . ")<br>";
-    echo "<a href='tinyfilemanager.php'>To main screen</a>";
+    echo "It is currently the latest version, so it will not be updated.(현재 최신 버전이므로 더 이상 업데이트되지 않습니다. Current version: " . $local_version . ")<br>";
+    echo "<a href='/core/tinyfilemanager.php'>관리자 페이지로 이동</a>";
 }
 ?>
