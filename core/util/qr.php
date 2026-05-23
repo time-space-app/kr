@@ -8,10 +8,11 @@ if (isset($_GET['param'])) {
     // 스크립트가 아무것도 출력하지 않도록 해야 합니다!!!
     // 그렇지 않으면 PNG 바이너리 파일이 손상될 수 있습니다!
     ob_start();
-    $codeText = 'http://localhost/news-letter.php?param='.$param; // 여기에 데이터베이스 요청
+    $codeContents = 'http://localhost/news-letter.php?param='.$param; // 여기에 데이터베이스 요청
     $debugLog = ob_get_contents();
     ob_end_clean(); // 여기서 처리가 종료됩니다
-    // DB와 연동된 내용이 아니고 직접 정보 보여줄때$item_location = '교무실'; // 설치장소
+    // DB와 연동된 내용이 아니고 직접 정보 보여줄때
+	/*
     $item_user = '김일국'; // 사용자명
     $item_location = '교무실'; // 설치장소
     $item_manager = '교무실'; // 관리자
@@ -52,8 +53,9 @@ if (isset($_GET['param'])) {
     '.$item_status.'-사용여부';
     // 메일 내용 조립
     $codeContents = 'mailto:'.$email.'?subject='.urlencode($subject).'&body='.urlencode($body);
-    header('Content-Type: image/png');  // 콘텐츠 타입을 PNG로 설정 후 직접 출력할 때
-    $pixel = 1; // 픽셀크기
+    */
+	header('Content-Type: image/png');  // 콘텐츠 타입을 PNG로 설정 후 직접 출력할 때
+    $pixel = 4; // 픽셀크기
     $pattern = [QR_ECLEVEL_L, QR_ECLEVEL_M, QR_ECLEVEL_Q, QR_ECLEVEL_H]; // 패턴 복잡도 L 이 가장단순하며 인쇄시 유리함.
     $margin = 4; // 외부 프레임 여백
     // 이미지를 PNG 스트림 형식으로 브라우저에 직접 출력합니다.
