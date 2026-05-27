@@ -113,9 +113,33 @@ $servername = $_ENV['DB_HOST'] ?? $env['DB_HOST'];
 $username = $_ENV['DB_USER'] ?? $env['DB_USER'];
 $password = $_ENV['DB_PASS'] ?? $env['DB_PASS'];
 $dbname = $_ENV['DB_NAME'] ?? $env['DB_NAME'];
-// 1. DB 연결 및 초기 테이블 생성
+// DB 연결 
 $conn = new mysqli($servername, $username, $password, $dbname);
-//$conn->set_charset("utf8");
+$conn->set_charset("utf8");
+// 초기 테이블 생성
+$sql = "CREATE TABLE IF NOT EXISTS item_manager (
+      id INT AUTO_INCREMENT COMMENT '등록번호',
+      item_user VARCHAR(255) NULL COMMENT '사용자명',
+      item_location VARCHAR(255) NULL COMMENT '설치장소',
+      item_manager VARCHAR(255) NULL COMMENT '관리자',
+      item_no VARCHAR(255) NOT NULL DEFAULT (CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H'), '-', LPAD(FLOOR(RAND() * 10000), 8, '0'))) COMMENT '식별번호',
+      item_id VARCHAR(255) NULL COMMENT '관리번호',
+      item_type VARCHAR(255) NULL COMMENT '기종',
+      item_model VARCHAR(255) NULL COMMENT '모델명',
+      item_cpu VARCHAR(255) NULL COMMENT 'CPU사양',
+      item_ram VARCHAR(255) NULL COMMENT 'RAM사양',
+      item_ssd VARCHAR(255) NULL COMMENT 'SSD사양',
+      item_os VARCHAR(255) NULL COMMENT 'OS사양',
+      item_maker VARCHAR(255) NULL COMMENT '제조사',
+      item_ip VARCHAR(255) NULL COMMENT 'IP주소',
+      item_date VARCHAR(255) NULL COMMENT '구입일',
+      item_price VARCHAR(255) NULL COMMENT '구입단가',
+      item_useful VARCHAR(255) NULL COMMENT '내용연수',
+      item_status VARCHAR(255) NOT NULL DEFAULT '사용' COMMENT '사용여부',
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='사용기기관리'
+    ";
+    $conn->query($sql);
 ?>
 <!-- 검색어 -->
 <style>
@@ -179,7 +203,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
     // 4 - 각 블럭의 end 페이지 값을 설정한다
     $end_num = $start_num + $block_size - 1;
     // 5 - 카운터 쿼리호출 (마지막 페이지에서 존재하지 않는 페이지 숫자를 없애주기 위해 토탈레코드 숫자를 구한다 )
-    $sql = "SELECT count(id) AS COUNT FROM school_manager WHERE item_user LIKE '%$keyword%'";
+    $sql = "SELECT count(id) AS COUNT FROM item_manager WHERE item_user LIKE '%$keyword%'";
     $result = mysqli_query($conn, $sql);
     $row =$result->fetch_assoc();
     if($row) $total_rec = $row['COUNT'];
@@ -209,7 +233,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 <ul class="m9-list-style-0 m9-float-2 m9-spacing-1 m-m9-float-1">
     <?php
     // 10 - 페이징 처리 쿼리 실행
-    $sql = "SELECT * FROM school_manager WHERE item_user LIKE '%$keyword%' ORDER BY id DESC LIMIT $st_limit , $recnum_per_page";
+    $sql = "SELECT * FROM item_manager WHERE item_user LIKE '%$keyword%' ORDER BY id DESC LIMIT $st_limit , $recnum_per_page";
     $res = mysqli_query($conn, $sql);
     if(mysqli_num_rows($res) > 0) { 
         while ($row = $res->fetch_assoc()) {
@@ -221,7 +245,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
     	<div class="display-table-cell vertical-align-top" style="width:100px">
     	<img src="/core/util/qr.php?param=<?php echo $row['id'] ?>" />
     	</div>
-    	<div class="display-table-cell vertical-align-top" style="cursor:pointer" onclick="openItemForm('edit',<?php echo $row['id'] ?>)">
+    	<div class="display-table-cell vertical-align-top" style="cursor:pointer" <?php if (isset($_SESSION['filemanager']['logged'])){ ?> onclick="openItemForm('edit',<?php echo $row['id'] ?>)" <?php } ?>>
     	<h3 class="font-weight-700 m9-f-large" style="margin-bottom:5px;"><?php echo $row['item_location'] ?></h3>
         	<div class="m9-f-small m9-font-color-3">
         	<?php 

@@ -8,7 +8,7 @@ if (isset($_GET['param'])) {
     // 스크립트가 아무것도 출력하지 않도록 해야 합니다!!!
     // 그렇지 않으면 PNG 바이너리 파일이 손상될 수 있습니다!
     ob_start();
-    $codeContents = 'http://localhost/news-letter.php?param='.$param; // 여기에 데이터베이스 요청
+    $codeContents = 'https://time-space.kr/item-manager-pop.php?mode=view&id='.$param; // 여기에 데이터베이스 요청
     $debugLog = ob_get_contents();
     ob_end_clean(); // 여기서 처리가 종료됩니다
     // DB와 연동된 내용이 아니고 직접 정보 보여줄때

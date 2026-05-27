@@ -3996,7 +3996,7 @@ function fm_show_nav_path($path)
 
                             <div class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="navbarDropdownMenuLink-5" data-bs-theme="<?php echo FM_THEME; ?>">
                                 <?php if (!FM_READONLY): ?>
-                                    <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?></a>
+                                    <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?>-<?php echo $_SESSION['filemanager']['logged'] ?></a>
                                     <a title="<?php echo lng('PhpInfo') ?>" class="dropdown-item nav-link" href="/core/util/phpinfo.php" target="_blank"><i class="fa fa-file" aria-hidden="true"></i> <?php echo lng('PhpInfo') ?></a>
                                     <a title="<?php echo lng('DBAdminer') ?>" class="dropdown-item nav-link" href="/core/util/adminer.php" target="_blank"><i class="fa fa-database" aria-hidden="true"></i> <?php echo lng('DBAdminer') ?></a>
                                 <?php endif ?>

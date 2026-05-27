@@ -43,6 +43,40 @@
     }
     .no-data { text-align:center; width: 100% !important; }
 </style>
+<script>
+$(document).ready(function() {
+	const button = $('#updateForm .btn-delete');
+	button.click(function(event) {
+		if (confirm("정말로 삭제하시겠습니까?") == true) {
+			event.preventDefault(); // 기본 동작 방지
+			// 1. input 요소의 값을 'delete'로 변경
+			const modeElements = $('#updateForm input[name="mode"]');
+			// 2. 전송 전 mode 값 변경
+            modeElements.val('delete');
+			// 3. 폼 전송
+			$('#updateForm').submit();
+			// 4. 전송 후 mode 값 변경
+			modeElements.val('update');
+		}
+	});
+});
+</script>
+<?php
+function maskName($name) {
+    $length = mb_strlen($name, 'UTF-8'); // 이름의 총 길이 계산
+    if ($length <= 2) {
+        // 2자 이하인 경우 첫 글자만 남기고 두 번째 글자 마스킹
+        $masked = mb_substr($name, 0, 1, 'UTF-8') . '*';
+    } else {
+        // 3자 이상인 경우 가운데 글자들을 *로 마스킹
+        $startStr = mb_substr($name, 0, 1, 'UTF-8'); // 첫 글자
+        $endStr = mb_substr($name, -1, 1, 'UTF-8');  // 마지막 글자
+        // 가운데 길이만큼 * 생성
+        $masked = $startStr . str_repeat('*', $length - 2) . $endStr;
+    }
+    return $masked;
+}
+?>
 <?php
     $mode = $_GET['mode'] ?? ''; //입력, 수정, 삭제
     $id = $_GET['id'] ?? ''; //입력, 수정, 삭제
@@ -57,36 +91,64 @@
     $username = $_ENV['DB_USER'] ?? $env['DB_USER'];
     $password = $_ENV['DB_PASS'] ?? $env['DB_PASS'];
     $dbname = $_ENV['DB_NAME'] ?? $env['DB_NAME'];
-    // 1. DB 연결 및 초기 테이블 생성
+    // DB 연결
     $conn = new mysqli($servername, $username, $password, $dbname);
-    //$conn->set_charset("utf8");
-    $conn = new mysqli("db", "myuser", "mypassword", "mydatabase");
-    $sql = "CREATE TABLE IF NOT EXISTS school_manager (
-      id INT AUTO_INCREMENT COMMENT '글번호',
-      item_user VARCHAR(255) NULL COMMENT '사용자명',
-      item_location VARCHAR(255) NULL COMMENT '설치장소',
-      item_manager VARCHAR(255) NULL COMMENT '관리자',
-      item_no VARCHAR(255) NOT NULL DEFAULT (CONCAT(DATE_FORMAT(NOW(), '%Y%m%d%H'), '-', LPAD(FLOOR(RAND() * 10000), 8, '0'))) COMMENT '식별번호',
-      item_id VARCHAR(255) NULL COMMENT '관리번호',
-      item_type VARCHAR(255) NULL COMMENT '기종',
-      item_model VARCHAR(255) NULL COMMENT '모델명',
-      item_cpu VARCHAR(255) NULL COMMENT 'CPU사양',
-      item_ram VARCHAR(255) NULL COMMENT 'RAM사양',
-      item_ssd VARCHAR(255) NULL COMMENT 'SSD사양',
-      item_os VARCHAR(255) NULL COMMENT 'OS사양',
-      item_maker VARCHAR(255) NULL COMMENT '제조사',
-      item_ip VARCHAR(255) NULL COMMENT 'IP주소',
-      item_date VARCHAR(255) NULL COMMENT '구입일',
-      item_price VARCHAR(255) NULL COMMENT '구입단가',
-      item_useful VARCHAR(255) NULL COMMENT '내용연수',
-      item_status VARCHAR(255) NOT NULL DEFAULT '사용' COMMENT '사용여부',
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='사용기기관리'
-    ";
-    $conn->query($sql);
+    $conn->set_charset("utf8");
 ?>
 <?php
 switch ($mode) {
+?>
+<?php
+	case 'view':
+?>
+    <form action="" method="post" id="viewForm">
+        <input type="hidden" id="mode" name="mode" value="view">
+        <input type="hidden" id="id" name="id" value="<?php echo $id ?>">
+        <div class="m9-grid-block">
+        <div class="m9-grid-1">
+        <div class="m9-column-1">
+        <div class="m9-user-background-1 m9-padding-1">
+        <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
+        <?php
+        $sql = "SELECT * FROM item_manager WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+		$stmt->bind_param("i", $id);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		$row = $result->fetch_assoc();
+		?>
+		    <?php 
+				while ($field = mysqli_fetch_field($result)) {
+				$fieldName = $field->name; // 필드명
+				$fieldValue = $row[$fieldName]; // 필드 데이터
+				
+			?>
+    			<?php if($fieldName == 'id') { ?>
+    			<?php }elseif($fieldName == 'item_user') { ?>
+    			<li>
+    			    <div class="display-table width-100 m9-padding-1 m9-border background-color-white m9-round-3">
+                    [<?php echo substr($fieldName,5) ?>]:
+                    <?php echo maskName($fieldValue) ?>
+                    </div>
+                </li>
+    			<?php }else{ ?>
+    		    <li>
+    		    <div class="display-table width-100 m9-padding-1 m9-border background-color-white m9-round-3">
+                    [<?php echo substr($fieldName,5) ?>]:
+                    <?php echo $fieldValue?>
+                </div>
+    			</li>
+    			<?php } ?>
+		<?php } ?>
+        </ul>
+        </div>
+        </div>
+        </div>
+        </div>
+    </form>
+<?php
+    $stmt->close();
+    break;
 ?>
 <?php
 	case 'edit':
@@ -100,7 +162,7 @@ switch ($mode) {
         <div class="m9-user-background-1 m9-padding-1">
         <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
         <?php
-        $sql = "SELECT * FROM school_manager WHERE id = ?";
+        $sql = "SELECT * FROM item_manager WHERE id = ?";
         $stmt = $conn->prepare($sql);
 		$stmt->bind_param("i", $id);
 		$stmt->execute();
@@ -117,7 +179,7 @@ switch ($mode) {
     			<li>
     			    <div class="display-table width-100 m9-padding-1 m9-border background-color-white m9-round-3">
                     <label for="<?php echo $fieldName?>"><?php //echo $row['Comment'] ?></label>
-                    <input type="text" id="<?php echo $fieldName?>" name="<?php echo $fieldName?>" value="<?php echo $fieldValue?>" readonly style="border:0">
+                    <input type="text" value="<?php echo $fieldValue?>" readonly style="border:0">
                     </div>
                 </li>
     			<?php }else{ ?>
@@ -134,10 +196,12 @@ switch ($mode) {
         </div>
         </div>
         </div>
+        <?php if (isset($_SESSION['filemanager']['logged'])){ ?>
         <div class="view-actions no-data">
         <button type="submit" class="btn btn-submit">수정하기</button>
         <button type="button" class="btn btn-delete">삭제하기</button>
         </div>
+        <?php } ?>
     </form>
 <?php
     $stmt->close();
@@ -175,6 +239,7 @@ switch ($mode) {
 	case 'csv':
 ?>
     <form action="/core/api/item-manager-api.php" method="post" id="csvForm" enctype="multipart/form-data" style="height:250px;">
+	<input type="hidden" id="mode" name="mode" value="csv">
         <div class="m9-grid-block">
         <div class="m9-grid-1">
         <div class="m9-column-1">
@@ -209,7 +274,7 @@ switch ($mode) {
         <div class="m9-user-background-1 m9-padding-1">
         <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
         <?php 
-			$sql = "SHOW FULL COLUMNS FROM school_manager";
+			$sql = "SHOW FULL COLUMNS FROM item_manager";
 			$result = $conn->query($sql);
 			while($row = $result->fetch_assoc()){
 		?>

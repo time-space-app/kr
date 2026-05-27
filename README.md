@@ -7,7 +7,9 @@
 └── core/ (홈페이지 빌드의 핵심코드인 티니파일매니저v2.6 오픈소스 위치)
     ├── api/ (게시판과 같은 백엔드 처리 위치)
         ├── board-api.php(RestAPI게시판 백엔드 CRUD처리 소스)
+        ├── item-manager-api.php(Rest가 아닌 물품관리 API 백엔드 CRUD처리 소스)
         ├── news-letter-api.php(RestAPI뉴스레터 백엔드 CRUD처리 소스)
+        ├── phpqrcode.php(물품관리 API에 사용되는 QR코드코드생성기로 오픈소스사용)
         ├── pwd-api.php(티니파일매니저 환경설정 파일소스에서 admin, user암호만 변경할 때 신규암호를 생성하는 백엔드 처리 소스)
         └── secure-api.php(게시판이나 뉴스레터와 같은 백엔드 처리 시 보안위협을 방지하는 소스)
     ├── theme/ (게시판과 같은 기능을 추가하는 위치)
@@ -26,7 +28,8 @@
         ├── file-download.php(RestAPI게시판 백엔드 첨부파일 처리 소스)
         ├── phpinfo.php(파일관리자로 로그인 후  현재 서버의 시스템정보를 확인하는 소스)
         ├── proxy.php(구글지도를 사용할 때 API키를 백앤드에서 호출하여 API키 노출을 방지하는 소스)
-        └── pwd.html(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경할 때 신규암호를 생성하는 UI화면)
+        ├── pwd.html(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경할 때 신규암호를 생성하는 UI화면)
+        └── qr.php(물품관리 샘픔페이지와 연동되는 QR코드 생성기의 링크URL 생성 백엔드를 처리하는 소스)
     ├── config.txt(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경 후 config.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── env.txt(타임스페이스 kr빌더의 환경설정 파일로 DB와 구글지도를 사용한다면 해당 정보를 입력 후 env.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── tinyfilemanager.org(티니파일매니저 원본 오픈소스. 아래 타임스페이스 kr빌더에서 변경한 tinyfilemanager.php 파일과 비교 시 확인용으로 사용한다.)
@@ -34,10 +37,13 @@
 ├── smarteditor2/ (몽9에디터를 플러그인으로 사용할 디자인에디터에 플러그인폴더만 추가 후 수정없는 원본 오픈소스사용)
 ├── index.php (티니파일매저에서 index 테마로 선택 후 제공된 몽9에디터로 제작된 샘플 메인-게시판페이지)
 ├── index-temp.html (제공된 페이지준비중 안내 페이지)
+├── item-manager.php (티니파일매저에서 light 테마로 선택 후 PHP앱용으로 제작된 QR코드연동 물품관리 샘플 페이지)
+├── item-manager-pop.php (티니파일매저에서 PHP앱용으로 제작된 QR코드연동 물품입력/수정/삭제 팝업창 샘플 페이지)
 ├── LICENSE (타임스페이스 kr빌더의 GPL-3.0 라이센스내용)
 ├── light.php (티니파일매저에서 light 테마로 선택 후 제공된 몽9에디터로 제작된 샘플 디자인페이지)
 ├── news-letter.php (티니파일매저에서 news-letter 테마로 선택 후 제공된 몽9에디터로 제작된 뉴스레터 게시판연동 샘플 페이지)
-└── README.md (빌더 이용 시 도움이되는 설명문)
+├── README.md (빌더 이용 시 도움이되는 설명문)샘플-물품보유현황.csv
+└── 샘플-물품보유현황.csv (물품관리샘플페이지에서 일괄업로드에 사용되는 샘플 CSV 데이터파일)
 ```
 #### 정말 간단한 사용방법(아래)
 - 현재 깃 허브에서 최신 버전이 포함된 ZIP 파일을 다운로드하세요.
@@ -80,9 +86,9 @@ return [
 - 디자인 에디터(Mong9)와 코어 에디터(Ace)로 분리 후 디자인 에디터에서 ckeditor4를 사용가능하고 smarteditor2는 해당 소스 근처에 주석으로 남겼으니 필요시 소스코드의 주석을 해제해서 사용하세요.
 - 디자인파일을 만들기 전 반드시 테마를 선택 후 만들어야 기본 디자인 페이지 외에 원하는 게시판, 지도 및 뉴스레터 기능이 자동연동 됩니다.(현재 3개의 테마가 샘플로 제공 됩니다.)
 #### 앞으로 작업예정(아래)
-- 코어 에디터로 재고조사.php 만들기
 - 도메인 호스팅에 배포
 #### 작업내역 정리(아래)
+- QR코드가 연동되는 물품관리 기능의 샘플 페이지 추가 및 CRUD 보안적용.
 - 메뉴는 템플릿 디자인이 없기 때문에 1개만 별도 제작 후 index테마에 포함(메뉴에 페이지 번역기능 추가).
 - 몽9에디터의 템플릿디자인과 연동되는 구글지도맵, 게시판, 메뉴까지 theme 폴더에 기능별로 분리한다.
 - RestAPI+Ajax 방식으로 index테마와 news-letter테마에서 1페이지 CRUD를 작업완료
@@ -106,6 +112,9 @@ return [
 - https://github.com/mong9/smarteditor2-plugin-mong9-editor (GNU General Public License v3.0)
 #### Adminer DB매니저 포함(아래)
 - https://www.adminer.org/ (오픈소스인 v5.4.2 사용 LICENSE-2.0 Apache License, GNU General Public License v2.0 배포)
+#### QR코드 생성기 물품관리 앱에 포함됨(아래)
+- https://phpqrcode.sourceforge.net/ (2010100721_1.1.4버전, 100% Open Source, LGPL Licensed)
+
 
 ### 개발환경(아래)
 #### 도커 데스크탑의 컨테이너로 개발환경을 사용(아래)
