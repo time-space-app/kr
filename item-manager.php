@@ -208,7 +208,7 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
     $row =$result->fetch_assoc();
     if($row) $total_rec = $row['COUNT'];
     // 6 - 한페이지당 보여줄 레코드 수 설정
-    $recnum_per_page = 4; $start = 0;
+    $recnum_per_page = 8; $start = 0;
     // 7 - 불러오기 쿼리문에서 시작레코드 숫자 지정
     if($now_page == 1){
         $st_limit = 0;
@@ -220,17 +220,28 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
     // 9 - 다음 블럭 설정
     $next_block = $end_num + 1;
 ?>
-<form class="search-container" action="" method="GET">
+<style>
+/* 인쇄 시 적용될 스타일 */
+@media print {
+    .no-print { display: none; } /* 인쇄물에서 제외할 요소 */
+    .print-area { display: block; } /* 인쇄할 요소 */
+    
+    @page {
+        margin: 10mm; /* A4 용지 여백 설정 */
+    }
+}
+</style>
+<form class="search-container no-print" action="" method="GET">
     <input type="search" id="search" name="search" placeholder="검색어를 입력하세요.">
     <button type="submit">검색</button>
 </form>
-<div class="no-data"><span>검색된 전체 물품갯수 : <?php echo $total_rec ?> 개</span></div>
+<div class="no-data no-print"><span>검색된 전체 물품갯수 : <?php echo $total_rec ?> 개</span></div>
 <!--//Mong9 Editor//-->
 <div class="m9-grid-block">
 <div class="m9-grid-1">
 <div class="m9-column-1">
 <div class="m9-user-background-1 m9-padding-1">
-<ul class="m9-list-style-0 m9-float-2 m9-spacing-1 m-m9-float-1">
+<ul class="m9-list-style-0 m9-float-2 m9-spacing-1 m-m9-float-1 print-area">
     <?php
     // 10 - 페이징 처리 쿼리 실행
     $sql = "SELECT * FROM item_manager WHERE item_user LIKE '%$keyword%' ORDER BY id DESC LIMIT $st_limit , $recnum_per_page";
@@ -275,7 +286,7 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
 <?php } ?>
 </ul>
 </div>
-<div class="pagination">
+<div class="pagination no-print">
     <?php if($start_num > 1){ ?>
     <a class="nav-btn btn prev" href="<?php echo '?now_page='.$before_block.'&search='.$keyword?>">이전</a>
     <?php } ?>

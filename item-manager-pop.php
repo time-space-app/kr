@@ -258,6 +258,7 @@ switch ($mode) {
         </div>
         <div class="view-actions no-data">
         <button type="submit" class="btn btn-submit">CSV파일 일괄 업로드</button>
+        <a href="/item-list-sample.csv" class="btn btn-submit" download>CSV파일 샘플 다운로드</a>
         </div>
     </form>
 <?php

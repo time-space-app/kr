@@ -19,5 +19,11 @@ $apiKey = $_ENV['GOOGLE_API_KEY'] ?? $env['GOOGLE_API_KEY'];
 $query = $_GET['callback']; //호출하는 곳의 자바스크립트 렌더링 함수
 $url = "https://maps.googleapis.com/maps/api/js?key=".$apiKey."&callback=".htmlspecialchars($query);
 // 요청 전달 및 결과 반환
-echo file_get_contents($url);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$output = curl_exec($ch);
+curl_close($ch);
+echo $output;
+//echo file_get_contents($url); //서버에서 allow_url_fopen 을 지원해 줄 때는 위 6줄이 필요없이 이것만 있으면 된다.
 ?>

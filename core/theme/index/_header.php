@@ -17,6 +17,7 @@
     <script src="https://code.jquery.com/jquery-latest.js"></script>
     <style>
         /* 기본 스타일 */
+        .m9-btn { padding : 0.5em 1.0em !important; }
         .board-container {margin: 0 auto; padding: 20px; }
         .list-header, .list-item { display: flex; padding: 10px; border-bottom: 1px solid #ddd; }
         .list-header { font-weight: bold; background-color: #f5f5f5; }

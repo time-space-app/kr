@@ -6,7 +6,7 @@
 <div class="m9-margin-bottom-1 after-clear-both">
 <div class="float-right m9-margin-left-2 m-m9-margin-left-0 e-float-none e-text-align-center ">
 <div class="display-inline-block">
-<div class="display-block m9-img-wrap"><img alt="" alt_no="1" class="m-width-auto m9-fullimg m9-img-size-1" src="http://localhost/ckeditor/plugins/mong9-editor/data/2026/05/2a79ea27c279e471f4d180b08d62b00a.png" /></div>
+<div class="display-block m9-img-wrap"><img alt="" alt_no="1" class="m-width-auto m9-fullimg m9-img-size-1" src="/ckeditor/plugins/mong9-editor/data/2026/05/2a79ea27c279e471f4d180b08d62b00a.png" /></div>
 
 <div class="display-block text-align-center m9-padding-1">CEO | <span style="letter-spacing:7px">__김일국__</span></div>
 </div>
@@ -16,9 +16,9 @@
 <div>
 <h4 class="m9-h4 m9-f-xxxlarge m-m9-f-xlarge e-m9-f-large">Time-Space 에 오신 것을 환영합니다!</h4>
 
-<p class="m9-margin-height-2 text-align-justify">Time-Space 는 홈페이지 및 웹 프로그램 제작 회사 입니다.&nbsp;단, 현재 신규 프로젝트 제작은 하지 않기 때문에, 기존 사이트 유지 보수 및 강의 위주로 일을 맡겨 주시면 성실하게 일하겠습니다.<br class="_mong9" />
-간단히 회사 소개를 드리면, 2013년 백석 대학교 창업 보육 센터에서 1인 창조 기업으로 출발하여 지금은 천안 터미널 부근에서 사무실을 운영하고 있습니다.<br class="all-br" />
-현재는 외부 기관의 홈페이지 사이트 유지 보수만 진행하고 있으며, 프리랜서 프로그램 강사로서 중학교부터 대학교까지 다양한 기관에서 강사와 디지털 튜터로 일을 하고 있습니다. 또한, 오랜 기간 웹 분야에서 일하였기 때문에 프로그램 수정과 보안 위협에 대한 다양한&nbsp;경험을 하였습니다.</p>
+<p class="m9-margin-height-2 text-align-justify">Time-Space 는 홈페이지 및 웹 프로그램 오픈소스를 제작 합니다.&nbsp;단, 현재 신규 프로젝트 제작은 하지 않기 때문에, 기존 사이트 유지 보수 및 강의 위주로 작업을 하고 있습니다.<br class="_mong9" />
+간단히 개인 소개를 드리면, 2013년 백석 대학교 창업 보육 센터에서 1인 창조 기업으로 출발하여 지금은 천안 터미널 부근에서 개인 사무실을 운영하고 있습니다.<br class="all-br" />
+현재는 외부 기관의 사이트 유지 보수만 진행하고 있으며, 프리랜서 프로그램 강사로서 중학교부터 대학교까지 다양한 기관에서 강사와 디지털 튜터로 일을 하고 있습니다. 또한, 오랜 기간 웹 분야에서 일하였기 때문에 다양한 프로그래밍 환경과 보안 위협에 대한 경험을 하였습니다.</p>
 
 <div class="m9-font-color-3">
 <ul class="m9-list-style-2">
@@ -40,7 +40,7 @@
 <div class="m9-column-1 _not-copy">
 <div>
 <div class="m9-padding-2 m9-padding-bottom-1 m9-border after-clear-both e-m9-padding-1">
-<div class="float-left text-align-center m9-margin-right-2 e-float-none e-m9-margin-right-0 e-m9-margin-bottom-1"><img alt="" alt_no="1" class="m9-fullimg" data-m9-e-style="width:auto" src="http://localhost/ckeditor/plugins/mong9-editor/source/img/example/example021.jpg" style="width:210px" /></div>
+<div class="float-left text-align-center m9-margin-right-2 e-float-none e-m9-margin-right-0 e-m9-margin-bottom-1"><img alt="" alt_no="1" class="m9-fullimg" data-m9-e-style="width:auto" src="/ckeditor/plugins/mong9-editor/source/img/example/example021.jpg" style="width:210px" /></div>
 
 <div class="overflow-hidden">
 <h3 class="m9-h3 m9-margin-bottom-1 m9-font-family-3 m9-padding-bottom-1 m9-border-bottom e-text-align-center">Time-Space 의 kr 홈페이지 빌더를 사용하여 1페이지 사이트를 제작합니다.&nbsp;</h3>
@@ -51,9 +51,9 @@
 
 <div class="m9-padding-width-2 m9-padding-height-1 m9-border m-m9-padding-1 m-m9-padding-top-2" style="margin-top:-1px">
 <div class="table">
-<div class="table-cell text-align-left vertcal-align-middle m-display-block m-m9-margin-bottom-1 m-text-align-center"><em class="bi bi-check-circle-fill"><em>&nbsp;</em></em>&nbsp;업무 상담 및 교육 신청 : kimilguk@yahoo.co.kr</div>
+<div class="table-cell text-align-left vertcal-align-middle m-display-block m-m9-margin-bottom-1 m-text-align-center"><em class="bi bi-check-circle-fill"><em>&nbsp;</em></em>&nbsp;상담 : kimilguk@yahoo.co.kr</div>
 
-<div class="table-cell text-align-right vertcal-align-middle m-display-block m-m9-margin-bottom-1 m-text-align-center"><a class="m9-btn m9-btn-warning m9-btn-icon-position-right m9-btn-icon-effect-rotate-1" href="https://github.com/time-space-app/kr.git" target="_blank" title="Time-Space.kr 빌더를 다운로드 받을 수 있는 저장소 입니다.">Download 저장소<em class="_m9-btn-icon bi bi-plus"><em>&nbsp;</em></em></a> <a class="m9-btn" href="/light.php" target="_blank" title="기본 Light테마 샘플">DEMO-기본Light테마사용</a> <a class="m9-btn" href="/news-letter.php" target="_blank" title="뉴스레터 테마사용 샘플">DEMO-뉴스레터테마사용</a></div>
+<div class="table-cell text-align-right vertcal-align-middle m-display-block m-m9-margin-bottom-1 m-text-align-center"><a class="m9-btn m9-btn-warning m9-btn-icon-position-right m9-btn-icon-effect-rotate-1" href="https://github.com/time-space-app/kr.git" target="_blank" title="Time-Space.kr 빌더를 다운로드 받을 수 있는 저장소 입니다.">Download 저장소</a><em>&nbsp;</em><a class="m9-btn" href="/light.php" target="_blank" title="">DEMO-기본Light테마사용</a><em>&nbsp;</em><a class="m9-btn" href="/news-letter.php" target="_blank" title="뉴스레터 테마사용 샘플">DEMO-뉴스레터테마사용</a><em>&nbsp;</em><a class="m9-btn" href="/item-manager.php" target="_blank" title="물품관리PHP 샘플">Light테마적용후물품관리샘플앱</a></div>
 </div>
 </div>
 </div>
