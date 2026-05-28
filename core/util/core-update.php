@@ -33,11 +33,20 @@ if ($remote_info['version'] > $local_version) {
     
     $tar_file = 'update.tar.gz';
     $download_url = $remote_info['download_url'];
-
+    // cURL 사용 시작
+    $ch2 = curl_init();
+    curl_setopt($ch2, CURLOPT_URL, $download_url);
+    curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true); // 결과를 문자열로 반환
+    curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false); // SSL 인증서 검증 생략 (필요시)
+    curl_setopt($ch2, CURLOPT_TIMEOUT, 10); // 타임아웃 설정 (10초)
+    $response = curl_exec($ch2);
+    if(curl_errno($ch2)){
+        echo 'cURL 에러: ' . curl_error($ch2);
+    }
+    curl_close($ch2); // fopen()을 사용하지 못할 때 대신 위 cURL 사용
     // 2. 파일 다운로드 (기존 코드 유지)
-	file_put_contents($tar_file, fopen($download_url, 'r'));
+	file_put_contents($tar_file, $response); // fopen($download_url, 'r') 대신
 	echo "파일 다운로드 완료.<br>";
-
 	// 3. tar.gz 압축 해제 및 덮어쓰기 (PharData 사용)
 	try {
 		// .tar.gz 파일인 경우
