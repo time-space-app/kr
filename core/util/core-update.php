@@ -11,8 +11,13 @@ if (!isset($_SESSION['filemanager']['logged'])) {
 // 1. 최신 버전 정보 가져오기
 $remote_version_url = 'https://raw.githubusercontent.com/time-space-app/kr-update/refs/heads/main/version.json';
 $local_version = '1.0'; // 현재 내 사이트 버전
-
-$remote_info = json_decode(file_get_contents($remote_version_url), true);
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $remote_version_url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$output = curl_exec($ch);
+curl_close($ch);
+//echo $output; //서버에서 allow_url_fopen 을 지원해 줄 때는 위 6줄이 필요없이 아래 주석된 코드만 있으면 된다.
+$remote_info = json_decode($output, true); // file_get_contents($remote_version_url)대신 다른코드 사용
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $core_check = $_POST['core_check'] ?? '';
     // 코어체크 전송과 최신 버전이 있다면 new 표시를 위해 1값 리턴 후 끝내기
