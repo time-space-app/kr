@@ -3964,7 +3964,7 @@ function fm_show_nav_path($path)
 							}
 						</style>
 						<li class="nav-item">
-                            <a title="<?php echo lng('CoreUpdate') ?>" class="nav-link" href="/core/util/core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version(코어 폴더의 소스 코드를 최신 버전으로 업데이트하시겠습니까)?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUpdate') ?><span class="new-tag">new</span></a>
+                            <a title="<?php echo lng('CoreUp') ?>" class="nav-link" href="/core/util/core-update.php" onclick="return confirm('Would you like to update the source code in the core folder to the latest version(코어 폴더의 소스 코드를 최신 버전으로 업데이트하시겠습니까)?');"><i class="fa fa-share-alt-square"></i> <?php echo lng('CoreUp') ?><span class="new-tag">new</span></a>
                         </li>
 						<script src="https://code.jquery.com/jquery-latest.js"></script>
 						<script>
@@ -3978,8 +3978,12 @@ function fm_show_nav_path($path)
 							dataType: 'text',
 							cache: false,
 							success: function(data){
-								if(data>0) {
+								const result = data.split('|'); 
+								if(result[0]>0) {
 									document.querySelector('.new-tag').style.display = 'inline';
+									document.querySelector('.new-tag').after(result[1]+'>'+result[2]);
+								}else{
+									document.querySelector('.new-tag').after(' '+result[1]);
 								}
 							},
 							error : function(xhr, status, error){
@@ -5770,7 +5774,7 @@ function fm_show_header_login()
         $tr['en']['Owner']          = 'Owner';
         $tr['en']['Search']         = 'Search';
         $tr['en']['NewItem']        = 'New Item';
-		$tr['en']['CoreUpdate']     = 'Core Update'; //kimilguk
+		$tr['en']['CoreUp']     	= 'CoreUp'; //kimilguk
         $tr['en']['Folder']         = 'Folder';
         $tr['en']['Delete']         = 'Delete';
         $tr['en']['Rename']         = 'Rename';

@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $core_check = $_POST['core_check'] ?? '';
     // 코어체크 전송과 최신 버전이 있다면 new 표시를 위해 1값 리턴 후 끝내기
     if (!empty($core_check) && $remote_info['version'] > $local_version) {		
-		echo 1;
+		echo "1|v" . $local_version. "|v" . $remote_info['version'];
 	}else{
-		echo 0;
+		echo "0|v" . $local_version;
 	}
 	exit;
 }
