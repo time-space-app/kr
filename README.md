@@ -1,4 +1,5 @@
-# time-space kr 1페이지 빌더 (앱 사용법은 https://kimilguk.tistory.com/931 에서 확인 가능합니다.)
+# time-space kr 1페이지 빌더 
+#### (앱 사용법은 https://kimilguk.tistory.com/931 에서 확인 가능합니다.)
 ### 폴더와 파일구조 및 사용방법(아래)
 #### 한눈에 보는 폴더와 파일구조(아래)
 ```
