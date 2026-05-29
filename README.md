@@ -1,9 +1,9 @@
-# time-space kr 홈페이지 빌더
+# time-space kr 1페이지 빌더 (앱 사용법은 https://kimilguk.tistory.com/931 에서 확인 가능합니다.)
 ### 폴더와 파일구조 및 사용방법(아래)
 #### 한눈에 보는 폴더와 파일구조(아래)
 ```
 ├── board_upload/ (몽9에디터와 연동된 공지사항 게시판의 첨부파일 업로드위치)
-├── ckeditor/ (몽9에디터를 플러그인으로 사용할 디자인에디터 플러그인폴더만 추가 후 수정없는 원본 오픈소스사용)
+├── ckeditor/ (몽9에디터를 플러그인으로 사용할 디자인에디터 플러그인폴더만 추가 후 https에서 http호출을 허용한 메타태그만 추가한 원본 오픈소스사용)
 └── core/ (홈페이지 빌드의 핵심코드인 티니파일매니저v2.6 오픈소스 위치)
     ├── api/ (게시판과 같은 백엔드 처리 위치)
         ├── board-api.php(RestAPI게시판 백엔드 CRUD처리 소스)
@@ -34,7 +34,7 @@
     ├── env.txt(타임스페이스 kr빌더의 환경설정 파일로 DB와 구글지도를 사용한다면 해당 정보를 입력 후 env.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── tinyfilemanager.org(티니파일매니저 원본 오픈소스. 아래 타임스페이스 kr빌더에서 변경한 tinyfilemanager.php 파일과 비교 시 확인용으로 사용한다.)
     └── tinyfilemanager.php(파일관리자로 로그인 후 1개의 파일에 실행소스가 모두 포함되어 있다. 수정된 오픈소스사용)
-├── smarteditor2/ (몽9에디터를 플러그인으로 사용할 디자인에디터에 플러그인폴더만 추가 후 수정없는 원본 오픈소스사용)
+├── smarteditor2/ (몽9에디터를 플러그인으로 사용할 디자인에디터에 플러그인폴더만 추가 후 https에서 http호출을 허용한 메타태그만 추가한 원본 오픈소스사용)
 ├── index.php (티니파일매저에서 index 테마로 선택 후 제공된 몽9에디터로 제작된 샘플 메인-게시판페이지)
 ├── index-temp.html (제공된 페이지준비중 안내 페이지)
 ├── item-list-sample.csv (물품관리샘플페이지에서 일괄업로드에 사용되는 샘플 CSV 데이터파일)
@@ -61,10 +61,10 @@ $auth_users = array(
 ```
 > [!WARNING]
 > DB접속 정보를 변경 하려면 아래 방법을 사용하세요
-> DB 설정파일을 사용하려면 [env.txt](https://github.com/time-space-app/kr/blob/v0.9/core/env.txt) 파일을 env.php 파일로 변경 후 접속정보와 AIP키를 입력합니다.(아래)
+> DB 설정파일을 사용하려면 [env.txt](https://github.com/time-space-app/kr/blob/v0.9/core/env.txt) 파일을 env.php 파일로 변경 후 접속정보와 AIP키를 본인 것으로 수정합니다.(아래)
 ```
 <?php
-//본인의 정보를 이곳에 입력 후 파일명을 env.php로 수정하면 됩니다.
+//본인의 정보를 이곳에 입력 후 파일명을 env.php로 수정한 후 서버에 업로드 합니다.
 return [
     'DB_HOST' => 'db',
     'DB_USER' => 'myuser',
@@ -177,5 +177,6 @@ volumes:
   db_data: 
 ```
 - 위 소스를 만들고, 컨테이너를 실행하는 내용은 제 블로그에서 참조 할 수 있다. ( https://kimilguk.tistory.com/927 )
-- 업로드와 같은 소스 권한필요 시 해당 컨테이너의 콘솔화면에서 다음 명령으로 웹 허용권한을 줄 수 있다. chown -R www-data:www-data /var/www/html
+- 도커 컨테이너에서 업로드와 같은 소스 권한필요 시 해당 컨테이너의 콘솔화면에서 다음 명령으로 웹 허용권한을 줄 수 있다. chown -R www-data:www-data /var/www/html
 - MS클라우드인 Azure 쿠버네티스(AKS)를 사용해도 동일하게 개발환경을 구성할 수 있다. 관련기술 참조. ( https://kimilguk.tistory.com/929 )
+- 앱 사용법과 호스팅에 위 앱을 배포한 후 클라우드플레어(https://www.cloudflare.com/ko-kr/)에서 http를 https로 적용하는 방법은 제 블로그에서 확인 할 수 있다.( https://kimilguk.tistory.com/931 )
