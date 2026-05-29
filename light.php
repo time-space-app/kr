@@ -61,4 +61,26 @@
 </div>
 </div>
 
+<div class="m9-grid-block">
+<div class="m9-grid-1">
+<div class="m9-column-1 _not-copy">
+<div class="after-clear-both">
+<div class="float-left m9-padding-right-3 m9-margin-bottom-1 m-float-none m-m9-padding-right-0" data-m9-m-style="max-width:100%" style="max-width:50%"><img alt="" alt_no="1" class="m-width-auto m9-fullimg m9-img-size-2" src="http://time-space.kr/ckeditor/plugins/mong9-editor/data/2026/05/a4a042cf4fd6bfb47701cbc8a1653ada.jpg" /></div>
+
+<div class="display-block overflow-hidden  m9-padding-height-1">
+<div class="m9-margin-bottom-1 e-text-align-center">
+<h2 class="m9-h2 font-weight-700 m9-f-xxxlarge m-m9-f-xxlarge e-m9-f-xlarge">Mong9 Editor</h2>
+
+<div class="m9-padding-height-1 m9-font-color-3">The possibilities of Web Editor are endless.</div>
+</div>
+
+<p class="m9-margin-bottom-2 m-m9-margin-bottom-2 e-text-align-center">본 글은 예시 문장입니다. 웹 문서 제작을 위한 편집기를 소개합니다. 몽9 에디터는 사용자들이 코딩 능력 없이도 간편하게 반응형 웹 문서를 제작하고 수정할 수 있는 기능을 제공합니다. 사용자들은 편리한 위지위그 에디터를 통해 문서를 실시간으로 작성하면서 결과물을 즉시 확인할 수 있습니다.</p>
+
+<p class="e-text-align-center"><a class="m9-btn m9-margin-right-1" href="#">SAMPLE</a> <a class="m9-btn" href="#">MORE</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
 <?php include_once __DIR__.'/core/theme/light/_footer.php'; ?>

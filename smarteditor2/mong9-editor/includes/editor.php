@@ -22,7 +22,7 @@ function mong9editor_editor() {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="shortcut icon" href="<?php echo MONG9_EDITOR__PLUGIN_URL ?>icons/mong9-editor-favicon.ico">
 	<title><?php echo (isset($_REQUEST['title']) && $_REQUEST['title'] != '') ? $_REQUEST['title'] .' - ' : '' ?>Mong9 Editor</title>
-
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <?php
 
 	mong9_enqueue_script('jquery',MONG9_SOURCE_URL.'etc/jquery/jquery.min.js');
