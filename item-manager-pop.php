@@ -42,6 +42,15 @@
         .btn { width: auto; } /* 데스크톱에서는 버튼 크기 자동 */
     }
     .no-data { text-align:center; width: 100% !important; }
+    /* 인쇄 시 적용될 스타일 */
+    @media print {
+        .no-print { display: none; } /* 인쇄물에서 제외할 요소 */
+        .print-area { display: block; } /* 인쇄할 요소 */
+        
+        @page {
+            margin: 10mm; /* A4 용지 여백 설정 */
+        }
+    }
 </style>
 <script>
 $(document).ready(function() {
@@ -62,6 +71,7 @@ $(document).ready(function() {
 });
 </script>
 <?php
+$table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 function maskName($name) {
     $length = mb_strlen($name, 'UTF-8'); // 이름의 총 길이 계산
     if ($length <= 2) {
@@ -99,6 +109,64 @@ function maskName($name) {
 switch ($mode) {
 ?>
 <?php
+	case 'print_all':
+?>
+        <div class="no-data no-print"><button type="button" class="btn btn-popup btn-list" onclick="window.print()">전체인쇄시작</button></div>
+        <div class="m9-grid-block">
+        <div class="m9-grid-1">
+        <div class="m9-column-1">
+        <div class="m9-user-background-1 m9-padding-1">
+        <ul class="m9-list-style-0 m9-float-2 m9-spacing-1 m-m9-float-1 print-area">
+        <?php
+        $sql = "SELECT * FROM $table_name WHERE 1 = 1 ORDER BY id DESC";
+        $res = mysqli_query($conn, $sql);
+            if(mysqli_num_rows($res) > 0) { 
+                while ($row = $res->fetch_assoc()) {
+                    // result 포인터를 초기화하여 첫 번째 필드부터 다시 가져옵니다
+            		mysqli_field_seek($res, 0);
+                ?>
+            	<li>
+            	<div class="display-table width-100 m9-padding-1 m9-border background-color-white m9-round-3">
+            	<div class="display-table-cell vertical-align-top" style="width:100px">
+            	<img src="/core/util/qr.php?param=<?php echo $row['id'] ?>" />
+            	</div>
+            	<div class="display-table-cell vertical-align-top">
+            	<h3 class="font-weight-700 m9-f-large" style="margin-bottom:5px;"><?php echo $row['item_location'] ?></h3>
+                	<div class="m9-f-small m9-font-color-3">
+                	<?php 
+                	$fieldValues = [];
+                	while ($field = mysqli_fetch_field($res)) {
+            		    $fieldName = $field->name; // 필드명
+                		if($fieldName == 'id' || $fieldName == 'item_location' || $fieldName == 'item_price') {
+                	        continue;
+                	    }else{
+                	        $fieldValues[] = $row[$fieldName]; // 필드 데이터
+                	    }
+                	}
+                	$values_string = "'" . implode("', '", $fieldValues) . "'";
+                	?>
+                    <?php echo $values_string; ?>
+                	</div>
+            	</div>
+            	</div>
+            	</li>
+        <?php }
+        	}else{ ?>
+        	<li class="no-data">
+            	<div class="display-table width-100 m9-padding-1 m9-border background-color-white m9-round-3">
+            	조회된 데이터가 없습니다.
+            	</div>
+            </li>
+        <?php } ?>
+        </ul>
+        </div>
+        </div>
+        </div>
+        </div>
+<?php
+    break;
+?>
+<?php
 	case 'view':
 ?>
     <form action="" method="post" id="viewForm">
@@ -110,7 +178,7 @@ switch ($mode) {
         <div class="m9-user-background-1 m9-padding-1">
         <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
         <?php
-        $sql = "SELECT * FROM item_manager WHERE id = ?";
+        $sql = "SELECT * FROM $table_name WHERE id = ?";
         $stmt = $conn->prepare($sql);
 		$stmt->bind_param("i", $id);
 		$stmt->execute();
@@ -162,7 +230,7 @@ switch ($mode) {
         <div class="m9-user-background-1 m9-padding-1">
         <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
         <?php
-        $sql = "SELECT * FROM item_manager WHERE id = ?";
+        $sql = "SELECT * FROM $table_name WHERE id = ?";
         $stmt = $conn->prepare($sql);
 		$stmt->bind_param("i", $id);
 		$stmt->execute();
@@ -275,7 +343,7 @@ switch ($mode) {
         <div class="m9-user-background-1 m9-padding-1">
         <ul class="m9-list-style-0 m9-float-3 m9-spacing-1 m-m9-float-1">
         <?php 
-			$sql = "SHOW FULL COLUMNS FROM item_manager";
+			$sql = "SHOW FULL COLUMNS FROM $table_name";
 			$result = $conn->query($sql);
 			while($row = $result->fetch_assoc()){
 		?>

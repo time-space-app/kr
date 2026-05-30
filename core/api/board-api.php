@@ -1,5 +1,6 @@
 <?php
 session_start();
+$table_name = "board"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 include_once __DIR__.'/secure-api.php';
 try {
 	header('Content-Type: application/json'); // JSON 응답 설정
@@ -21,7 +22,7 @@ try {
 	}
     // 1. DB 연결 및 초기 테이블 생성
     $conn = new mysqli($servername, $username, $password, $dbname);
-    $sql = "CREATE TABLE IF NOT EXISTS board (
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
       id INT AUTO_INCREMENT COMMENT '게시글 번호',
       title VARCHAR(255) NOT NULL COMMENT '제목',
       content TEXT NOT NULL COMMENT '내용',
@@ -59,7 +60,7 @@ try {
 						$response = ['result' => 'fail', 'message' => '파일업로드 오류가 발생 되었습니다.'];
 					}
 				}
-				$stmt = $conn->prepare("INSERT INTO board (title, content, file_name, file_save_name, writer) VALUES (?, ?, ?, ?, ?)");
+				$stmt = $conn->prepare("INSERT INTO $table_name (title, content, file_name, file_save_name, writer) VALUES (?, ?, ?, ?, ?)");
 				$stmt->bind_param("sssss", $title, $content, $fileName, $fileSaveName, $_SESSION['filemanager']['logged']);
 				$stmt->execute();
 				if ($stmt->affected_rows > 0) {
@@ -93,7 +94,7 @@ try {
 					// 파일 업로드
 					if (move_uploaded_file($_FILES["upload_file"]["tmp_name"], $uploadDir . $fileSaveName)) {
 						//기존파일이 있다면 삭제 시작
-						$sql = "SELECT * FROM board WHERE id = ?";
+						$sql = "SELECT * FROM $table_name WHERE id = ?";
 						$stmt = $conn->prepare($sql);
 						$stmt->bind_param("i", $id);
 						$stmt->execute();
@@ -109,7 +110,7 @@ try {
 						$stmt->close();
 						//기존파일이 있다면 삭제 끝
 						// 성공적으로 저장됨
-						$sql = "UPDATE board SET title = ?, content = ?, file_name = ?, file_save_name = ? WHERE id = ?";
+						$sql = "UPDATE $table_name SET title = ?, content = ?, file_name = ?, file_save_name = ? WHERE id = ?";
 						$stmt = $conn->prepare($sql);
 						$stmt->bind_param("ssssi", $title, $content, $fileName, $fileSaveName, $id);
 						$stmt->execute();
@@ -118,7 +119,7 @@ try {
 					}
 					
 				}else{
-					$sql = "UPDATE board SET title = ?, content = ? WHERE id = ?";
+					$sql = "UPDATE $table_name SET title = ?, content = ? WHERE id = ?";
 					$stmt = $conn->prepare($sql);
 					$stmt->bind_param("ssi", $title, $content, $id);
 					$stmt->execute();
@@ -138,7 +139,7 @@ try {
 		case 'view':
 			if (isset($_POST['id']) && !empty($_POST['id'])) {
 				$id = $_POST['id']; // 게시글 번호
-				$sql = "SELECT * FROM board WHERE id = ?";
+				$sql = "SELECT * FROM $table_name WHERE id = ?";
 				$stmt = $conn->prepare($sql);
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
@@ -152,7 +153,7 @@ try {
 					}
 				});
 				$response = ['result' => $row, 'message' => '글이 로드되었습니다.'];
-				$sql = "UPDATE board SET view_count = view_count + 1 WHERE id = ?";
+				$sql = "UPDATE $table_name SET view_count = view_count + 1 WHERE id = ?";
 				$stmt = $conn->prepare($sql);
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
@@ -164,7 +165,7 @@ try {
 		case 'delete':
 			if (isset($_POST['id']) && !empty($_POST['id']) && isset($_SESSION['filemanager']['logged'])) {
 				$id = $_POST['id']; // 게시글 번호
-				$sql = "SELECT * FROM board WHERE id = ?";
+				$sql = "SELECT * FROM $table_name WHERE id = ?";
 				$stmt = $conn->prepare($sql);
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
@@ -177,7 +178,7 @@ try {
 						unlink($uploadDir . $fileSaveName); // 실제 서버 파일 삭제
 					}
 				}
-				$sql = "DELETE FROM board WHERE id = ?";
+				$sql = "DELETE FROM $table_name WHERE id = ?";
 				$stmt = $conn->prepare($sql);
 				$stmt->bind_param("i", $id);
 				$stmt->execute();
@@ -198,7 +199,7 @@ try {
 			if ($page < 1) $page = 1;
 			$itemsPerPage = 4; // 한 페이지에 보여줄 개수
 			$offset = ($page - 1) * $itemsPerPage; //OFFSET 계산: (현재페이지 - 1) * 4
-			$sql = "SELECT * FROM board WHERE title LIKE ? ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
+			$sql = "SELECT * FROM $table_name WHERE title LIKE ? ORDER BY id DESC LIMIT $itemsPerPage OFFSET $offset";
 			$stmt = $conn->prepare($sql);
 			$search_param = "%" . $keyword . "%";
 			$stmt->bind_param("s", $search_param);

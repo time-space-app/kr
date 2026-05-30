@@ -1,5 +1,6 @@
 <?php
 session_start();
+$table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 // 설정 파일 불러오기
 $env = include_once dirname(__DIR__) . '/env.php';
 // 클라우드 서버변수인 $_ENV를 사용하고, 없다면 로컬 서버변수를 사용(아래)
@@ -34,7 +35,7 @@ if (isset($_FILES['excel_file']) && $_FILES['excel_file']['error'] == UPLOAD_ERR
     				$rowValue = mb_convert_encoding($row[$i], 'UTF-8', 'EUC-KR');
     				$fieldValues[] = $rowValue; 
     			}
-                $sql = "SHOW COLUMNS FROM item_manager";
+                $sql = "SHOW COLUMNS FROM $table_name";
     			$result = $conn->query($sql);
     			$fields = [];
     			while($row = $result->fetch_assoc()){
@@ -47,7 +48,7 @@ if (isset($_FILES['excel_file']) && $_FILES['excel_file']['error'] == UPLOAD_ERR
     			}
     			$field_string = implode(", ", $fields);
     			$values_string = "'" . implode("', '", $fieldValues) . "'";
-    			$sql = "INSERT INTO item_manager ($field_string) VALUES ($values_string)";
+    			$sql = "INSERT INTO $table_name ($field_string) VALUES ($values_string)";
     			mysqli_query($conn, $sql);
             }
             echo "<script>alert('일괄 업로드 및 저장이 완료되었습니다.'); if(window.opener)window.opener.location.reload();window.close()</script>";
@@ -66,7 +67,7 @@ if (isset($_POST['id']) && isset($_POST['mode']) && isset($_SESSION['filemanager
 	$mode = mysqli_real_escape_string($conn, $_POST['mode']);
 	switch ($mode) {
 		case 'add':
-			$sql = "SHOW COLUMNS FROM item_manager";
+			$sql = "SHOW COLUMNS FROM $table_name";
 			$result = $conn->query($sql);
 			$fields = [];
 			$fieldValues = [];
@@ -79,7 +80,7 @@ if (isset($_POST['id']) && isset($_POST['mode']) && isset($_SESSION['filemanager
 			}
 			$field_string = implode(", ", $fields);
 			$values_string = "'" . implode("', '", $fieldValues) . "'";
-			$sql = "INSERT INTO item_manager ($field_string) VALUES ($values_string)";
+			$sql = "INSERT INTO $table_name ($field_string) VALUES ($values_string)";
 			$result = mysqli_query($conn, $sql);
 			if ($result) {
 				echo "<script>alert('등록되었습니다.'); if(window.opener)window.opener.location.reload();window.close()</script>";
@@ -89,10 +90,10 @@ if (isset($_POST['id']) && isset($_POST['mode']) && isset($_SESSION['filemanager
 			break;
 		case 'update':
 			$id = mysqli_real_escape_string($conn, $_POST['id']);	
-			$sql = "SELECT * FROM item_manager WHERE id = '$id'";
+			$sql = "SELECT * FROM $table_name WHERE id = '$id'";
 			$res = mysqli_query($conn, $sql);
 			if ($res && $res->num_rows > 0) { 
-				$sql = "UPDATE item_manager SET ";
+				$sql = "UPDATE $table_name SET ";
 				while ($field = mysqli_fetch_field($res)) {
 					$fieldName = $field->name; // 필드명
 					if($fieldName != 'id') {
@@ -114,7 +115,7 @@ if (isset($_POST['id']) && isset($_POST['mode']) && isset($_SESSION['filemanager
 			break;
 		case 'delete':
 			$id = mysqli_real_escape_string($conn, $_POST['id']);	
-			$sql = "DELETE FROM item_manager WHERE id = ?";
+			$sql = "DELETE FROM $table_name WHERE id = ?";
 			$stmt = $conn->prepare($sql);
 			$stmt->bind_param("i", $id);
 			$stmt->execute();
@@ -126,7 +127,7 @@ if (isset($_POST['id']) && isset($_POST['mode']) && isset($_SESSION['filemanager
 			$stmt->close();
 			break;
 		case 'deleteAll':	
-			$sql = "TRUNCATE TABLE item_manager";
+			$sql = "TRUNCATE TABLE $table_name";
 			$result = mysqli_query($conn, $sql);
 			if ($result) {
 				echo "<script>alert('모두 삭제되었습니다.'); if(window.opener)window.opener.location.reload();window.close()</script>";

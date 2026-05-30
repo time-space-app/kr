@@ -95,7 +95,8 @@
         // 열린 창의 내용(DOM)이 모두 로드된 후 실행
         popup.onload = function() {
             // 팝업 내부의 실제 콘텐츠 크기 측정
-            var newWidth = popup.document.body.scrollWidth;
+            //var newWidth = popup.document.body.scrollWidth;
+            var newWidth = window.outerWidth;
             var newHeight = popup.document.body.scrollHeight;
             // 팝업 창 크기 조절
             popup.resizeTo(newWidth, newHeight);
@@ -106,6 +107,7 @@
     });
 </script>
 <?php
+$table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 // 설정 파일 불러오기
 $env = include_once __DIR__ . '/core/env.php';
 // 클라우드 서버변수인 $_ENV를 사용하고, 없다면 로컬 서버변수를 사용(아래)
@@ -117,7 +119,7 @@ $dbname = $_ENV['DB_NAME'] ?? $env['DB_NAME'];
 $conn = new mysqli($servername, $username, $password, $dbname);
 $conn->set_charset("utf8");
 // 초기 테이블 생성
-$sql = "CREATE TABLE IF NOT EXISTS item_manager (
+$sql = "CREATE TABLE IF NOT EXISTS $table_name (
       id INT AUTO_INCREMENT COMMENT '등록번호',
       item_user VARCHAR(255) NULL COMMENT '사용자명',
       item_location VARCHAR(255) NULL COMMENT '설치장소',
@@ -203,7 +205,7 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
     // 4 - 각 블럭의 end 페이지 값을 설정한다
     $end_num = $start_num + $block_size - 1;
     // 5 - 카운터 쿼리호출 (마지막 페이지에서 존재하지 않는 페이지 숫자를 없애주기 위해 토탈레코드 숫자를 구한다 )
-    $sql = "SELECT count(id) AS COUNT FROM item_manager WHERE item_user LIKE '%$keyword%'";
+    $sql = "SELECT count(id) AS COUNT FROM $table_name WHERE item_user LIKE '%$keyword%'";
     $result = mysqli_query($conn, $sql);
     $row =$result->fetch_assoc();
     if($row) $total_rec = $row['COUNT'];
@@ -244,7 +246,7 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
 <ul class="m9-list-style-0 m9-float-2 m9-spacing-1 m-m9-float-1 print-area">
     <?php
     // 10 - 페이징 처리 쿼리 실행
-    $sql = "SELECT * FROM item_manager WHERE item_user LIKE '%$keyword%' ORDER BY id DESC LIMIT $st_limit , $recnum_per_page";
+    $sql = "SELECT * FROM $table_name WHERE item_user LIKE '%$keyword%' ORDER BY id DESC LIMIT $st_limit , $recnum_per_page";
     $res = mysqli_query($conn, $sql);
     if(mysqli_num_rows($res) > 0) { 
         while ($row = $res->fetch_assoc()) {
@@ -308,6 +310,8 @@ $sql = "CREATE TABLE IF NOT EXISTS item_manager (
         <button type="button" class="btn btn-popup btn-submit" onclick="openItemForm('write')">개별등록창</button>
         <button type="button" class="btn btn-popup btn-list" onclick="openItemForm('csv')">csv일괄등록창</button>
         <button type="button" class="btn btn-popup btn-delete" onclick="openItemForm('delete_all')">전체삭제</button>
+        <button type="button" class="btn btn-popup btn-list" onclick="window.print()">현페이지인쇄</button>
+        <button type="button" class="btn btn-popup btn-list" onclick="openItemForm('print_all')">전체페이지인쇄</button>
     <?php } ?>
 </div>
 </div>
