@@ -5,9 +5,8 @@
             <a href=".top" class="sub-button"><i class="fa fa-home"></i>&nbsp;홈으로</a>
             <a href=".m9-list-style-" class="sub-button"><i class="fa fa-envelope"></i>&nbsp;게시판</a>
             <a href=".m9-google_map" class="sub-button"><i class="fa fa-share-alt"></i>&nbsp;오시는길</a>
-            <span class="sub-button lang-link" data-lang="zh-CN" style="cursor:pointer;"><i class="fa fa-file-o"></i>&nbsp;중국어</span>
+            <a href="#" onclick="event.preventDefault(); window.open('/core/chat.php', 'chatWindow', 'width=600,height=700,scrollbars=yes,resizable=yes');" class="sub-button"><i class="fa fa-file-code-o"></i>&nbsp;AI 챗봇</a>
             <span class="sub-button lang-link" data-lang="en" style="cursor:pointer;"><i class="fa fa-file-text-o"></i>&nbsp;영&nbsp;&nbsp;&nbsp;어</span>
-            <span class="sub-button lang-link" data-lang="ja" style="cursor:pointer;"><i class="fa fa-file-code-o"></i>&nbsp;일본어</span>
             <span class="sub-button lang-link" data-lang="ko" style="cursor:pointer;"><i class="fa fa-file-text"></i>&nbsp;한국어</span>
         </div>
         <div class="floating-button">
@@ -148,7 +147,7 @@
         margin-bottom: 15px;
         max-height: 0;
         overflow: hidden;
-        transition: max-height 0.3s ease;
+        /*transition: max-height 0.3s ease;*/
     }
     
     /* 메뉴가 열렸을 때 */
@@ -169,7 +168,7 @@
         height: 45px;
         background-color: #28a745;
         color: white;
-        border-radius: 10%;
+        /*border-radius: 10%;*/
         display: flex;
         justify-content: center;
         align-items: center;

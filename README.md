@@ -8,6 +8,7 @@
 └── core/ (홈페이지 빌드의 핵심코드인 티니파일매니저v2.6 오픈소스 위치)
     ├── api/ (게시판과 같은 백엔드 처리 위치)
         ├── board-api.php(RestAPI게시판 백엔드 CRUD처리 소스)
+        ├── chat-api.php(제미나이 기반의 RAG-검색 증강 생성 챗봇을 MD파일 기반으로 구현한 백엔드 소스)
         ├── item-manager-api.php(Rest가 아닌 물품관리 API 백엔드 CRUD처리 소스)
         ├── news-letter-api.php(RestAPI뉴스레터 백엔드 CRUD처리 소스)
         ├── phpqrcode.php(물품관리 API에 사용되는 QR코드코드생성기로 오픈소스사용)
@@ -27,10 +28,12 @@
         ├── adminer.php(DB관리자 로그인 후 1개의 파일에 DB관리에 대한 모든 기능이 포함되어 있다. 외부오픈소스사용)
         ├── core-update.php(파일관리자로 로그인 후 현재core폴더의 소스를 타임스페이스 kr빌더 깃 저장소의 소스와 비교 후 최신 소스로 업데이트 할 수 있다.)
         ├── file-download.php(RestAPI게시판 백엔드 첨부파일 처리 소스)
+        ├── Parsedown.php(제미나이 RAG-검색 증강 생성 챗봇에서 MarkDown출력결과를 보기좋은 html로 변경하는 오픈소스)
         ├── phpinfo.php(파일관리자로 로그인 후  현재 서버의 시스템정보를 확인하는 소스)
         ├── proxy.php(구글지도를 사용할 때 API키를 백앤드에서 호출하여 API키 노출을 방지하는 소스)
         ├── pwd.html(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경할 때 신규암호를 생성하는 UI화면)
         └── qr.php(물품관리 샘픔페이지와 연동되는 QR코드 생성기의 링크URL 생성 백엔드를 처리하는 소스)
+    ├── chat.php(제미나이 기반의 RAG-검색 증강 생성 챗봇을 MD파일 기반으로 구현한 UI샘플화면)
     ├── config.txt(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경 후 config.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── env.txt(타임스페이스 kr빌더의 환경설정 파일로 DB와 구글지도를 사용한다면 해당 정보를 입력 후 env.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── tinyfilemanager.org(티니파일매니저 원본 오픈소스. 아래 타임스페이스 kr빌더에서 변경한 tinyfilemanager.php 파일과 비교 시 확인용으로 사용한다.)
@@ -116,7 +119,10 @@ return [
 - https://www.adminer.org/ (오픈소스인 v5.4.2 사용 LICENSE-2.0 Apache License, GNU General Public License v2.0 배포)
 #### QR코드 생성기 물품관리 앱에 포함됨(아래)
 - https://phpqrcode.sourceforge.net/ (2010100721_1.1.4버전, 100% Open Source, LGPL Licensed)
-
+#### 제미나이 RAG-검색 증강 생성 챗봇에서 MarkDown출력결과를 보기좋은 html로 변경하는 PHP 오픈소스(아래)
+- https://github.com/erusev/parsedown/blob/master/Parsedown.php (1.8.0버전, MIT Licensed)
+- 위 PHP 백엔드단이 아닌 프런트엔드에서 처리하는 소스도 있다.(우리는 백엔드 단에서 사용하지만 아래 프런트엔드 소스로도 사용할 수도 있다.)
+- 위 프런트엔드 사용참고: <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>로 임포트 후 marked.parse(출력할데이터); 처럼 사용.
 
 ### 개발환경(아래)
 #### 도커 데스크탑의 컨테이너로 개발환경을 사용(아래)
