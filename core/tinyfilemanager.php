@@ -2074,6 +2074,34 @@ if (isset($_GET['edit']) && !FM_READONLY) {
                             <select id="js-ace-fontSize" data-type="fontSize" title="<?php echo lng('Select Font Size') ?>" class="btn-outline-secondary border-start-0 d-none d-lg-block">
                                 <option>-- <?php echo lng('Select Font Size') ?> --</option>
                             </select>
+							<script>
+							// kimilguk 버튼 클릭 시 자바스크립트 함수 호출
+							let aiWindow;
+							function openAiWindow() {
+								if (!aiWindow || aiWindow.closed) {
+									let url = "/core/chat-secure.php";
+									// 1. URLSearchParams 객체 생성
+									const urlParams = new URLSearchParams(window.location.search);
+									// 2. 개별 파라미터 값 가져오기 (get 메소드 사용)
+									const p = urlParams.get('p'); // 폴더위치
+									const e = urlParams.get('edit'); // 파일명
+									// 코어 에디터일 경우 추가 전달
+									url += "?position=" + p + "&target_file=" + e;
+									// 새 창의 옵션 지정 (가로 600px, 세로 700px)
+									// 모니터 가로 해상도 - 팝업창 가로 크기 = 오른쪽에 붙는 X 좌표
+									var leftPos = window.screen.width - 600;
+									leftPos += window.screenLeft; // 듀얼 모니터일 때
+									var topPos = 0; // 화면 상단에 붙임
+									const options = "width=600,height=700,left="+leftPos+",top="+topPos+",scrollbars=yes,resizable=yes";
+									// 새 창 열기
+									aiWindow = window.open(url, "aiWindow", options);
+								}else{
+									// 이미 열려있다면 기존 창을 활성화(포커스)
+									aiWindow.focus();
+								}
+							}
+							</script>
+							<button onclick="openAiWindow()" class="btn btn-sm btn-outline-secondary" title="AI-Code"><i class="fa fa-file-code-o" title="AI-Code"> AI</i></button>
                         </div>
                     <?php } ?>
                 </div>

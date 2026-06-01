@@ -1,5 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['filemanager']['logged'])) {
+    echo "<script>alert('로그인이 필요합니다.'); location.href='/core/tinyfilemanager.php';</script>";
+    exit; // 스크립트 실행 중단
+}
 include_once dirname(__DIR__) . '/util/Parsedown.php'; //마크다운 형식으로 변환
+$targetFile = $_GET['target'] ?? 'README.md'; //코어 에디터와 홈페이지AI챗봇과 공통사용 가능
 // 1. API 키 및 설정
 // 설정 파일 불러오기
 $env = include_once dirname(__DIR__) . '/env.php';
@@ -12,7 +18,7 @@ $model = $_ENV['API_MODEL'] ?? $env['API_MODEL']; // 사용할 모델명
 //if($host == "time-space.kr") $protocol = "https://";
 //$rootUrl = $protocol . $host;
 //$mdFilePath = $rootUrl ."/README.md";
-$mdFilePath = "file://".$_SERVER['DOCUMENT_ROOT']."/README.md"; // 위 5줄 코드는 외부 URL에서 가져올때, 이것은 로컬에서 가져올때
+$mdFilePath = "file://".$_SERVER['DOCUMENT_ROOT']."/".$targetFile; // 위 5줄 코드는 외부 URL에서 가져올때, 이것은 로컬에서 가져올때
 //$mdFilePath = dirname(dirname(__DIR__)) ."/README.md"; // file_get_contents을 사용가능하다면 위 5줄 코드는 필요없다.
 $systemInstruction = "";
 //if (file_exists($mdFilePath)) {

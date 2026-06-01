@@ -1,11 +1,31 @@
 <!-- 메뉴 모듈 시작 -->
+    <script>
+    // kimilguk 버튼 클릭 시 자바스크립트 함수 호출
+    let aiWindow;
+    function openAiWindow() {
+    	if (!aiWindow || aiWindow.closed) {
+    		let url = "/core/chat.php";
+    		// 새 창의 옵션 지정 (가로 600px, 세로 700px)
+    		// 모니터 가로 해상도 - 팝업창 가로 크기 = 오른쪽에 붙는 X 좌표
+    		var leftPos = window.screen.width - 600;
+    		leftPos += window.screenLeft; // 듀얼 모니터일 때
+    		var topPos = 0; // 화면 상단에 붙임
+    		const options = "width=600,height=700,left="+leftPos+",top="+topPos+",scrollbars=yes,resizable=yes";
+    		// 새 창 열기
+    		aiWindow = window.open(url, "aiWindow", options);
+    	}else{
+    		// 이미 열려있다면 기존 창을 활성화(포커스)
+    		aiWindow.focus();
+    	}
+    }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
     <div class="floating-container">
         <div class="floating-menu">
             <a href=".top" class="sub-button"><i class="fa fa-home"></i>&nbsp;홈으로</a>
             <a href=".m9-list-style-" class="sub-button"><i class="fa fa-envelope"></i>&nbsp;게시판</a>
             <a href=".m9-google_map" class="sub-button"><i class="fa fa-share-alt"></i>&nbsp;오시는길</a>
-            <a href="#" onclick="event.preventDefault(); window.open('/core/chat.php', 'chatWindow', 'width=600,height=700,scrollbars=yes,resizable=yes');" class="sub-button"><i class="fa fa-file-code-o"></i>&nbsp;AI 챗봇</a>
+            <a href="#" onclick="event.preventDefault(); openAiWindow();" class="sub-button"><i class="fa fa-file-code-o"></i>&nbsp;AI 챗봇</a>
             <span class="sub-button lang-link" data-lang="en" style="cursor:pointer;"><i class="fa fa-file-text-o"></i>&nbsp;영&nbsp;&nbsp;&nbsp;어</span>
             <span class="sub-button lang-link" data-lang="ko" style="cursor:pointer;"><i class="fa fa-file-text"></i>&nbsp;한국어</span>
         </div>

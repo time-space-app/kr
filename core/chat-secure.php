@@ -1,3 +1,18 @@
+<?php
+session_start();
+if (!isset($_SESSION['filemanager']['logged'])) {
+    echo "<script>alert('로그인이 필요합니다.'); location.href='/core/tinyfilemanager.php';</script>";
+    exit; // 스크립트 실행 중단
+}
+if ($_GET['position']) {
+    $position = $_GET['position'].'/';
+}else{
+	$position = '/';
+}
+if ($_GET['target_file']) {
+    $targetFile = $_GET['target_file'];
+}
+?>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -14,14 +29,27 @@
         .bot { text-align: left; color: green; }
         input[type="text"] { width: 80%; padding: 10px; }
         button { padding: 10px; }
+        /* textarea 스타일 추가 */
+        .textarea {
+            width: 100%; /* input[type="text"]와 동일하게 80% 너비 */
+            padding: 10px; /* input[type="text"]와 동일한 패딩 */
+            height: 60px; /* 텍스트 입력 영역의 적절한 초기 높이 */
+            margin-bottom: 10px; /* 버튼과의 간격을 위한 아래쪽 여백 */
+            border: 1px solid #ddd; /* chat-box와 유사한 테두리 */
+            border-radius: 4px; /* 살짝 둥근 모서리 */
+            box-sizing: border-box; /* 패딩과 테두리가 너비에 포함되도록 설정 */
+            resize: vertical; /* 사용자에게 수직 방향으로만 크기 조절 허용 */
+            font-size: 1em; /* 기본 글자 크기 */
+            line-height: 1.5; /* 줄 간격 */
+        }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
-    <h2>AI 챗봇-kr 1페이지 빌더에대해 물어보세요</h2>
+    <h3><?php echo $position.$targetFile ?>에 대해 물어보세요</h3>
     <div class="chat-box" id="chatBox"></div>
-    <input type="text" id="userInput" placeholder="질문을 입력하세요...">
+    <textarea class="textarea" type="text" id="userInput" placeholder="질문을 입력하세요..."></textarea>
     <button onclick="sendMessage()">전송</button>
 </div>
 
@@ -41,7 +69,7 @@
 
         // 서버(PHP)로 전송
         try {
-            const response = await fetch('api/chat-api.php', {
+            const response = await fetch('api/chat-secure-api.php?target=<?php echo $position.$targetFile ?>', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ message: userMessage }).toString()
