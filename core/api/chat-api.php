@@ -20,7 +20,8 @@ $systemInstruction = "";
     curl_setopt($ch, CURLOPT_URL, $mdFilePath);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // 결과를 문자열로 반환
     curl_setopt($ch, CURLOPT_HEADER, false);        // 헤더 정보 포함 안 함
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);          // 타임아웃 시간(초)
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);// HTTPS 연결 오류 안 함
+    curl_setopt($ch, CURLOPT_TIMEOUT, 60);          // 타임아웃 설정
     $output = curl_exec($ch);
     // 에러 체크
     if (curl_errno($ch)) {
