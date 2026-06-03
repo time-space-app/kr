@@ -2233,19 +2233,133 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 		?>
 			<?php if($ext == "md") { //kimilguk ?>
 				<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-				<div style="width:50vw;border:1px solid #ccc;" id="editor" contenteditable="true"><?php echo htmlspecialchars($content);?></div>
-				<div style="background-color:#f9f9f9;position:absolute;left:52vw;top:90px;width:48vw;height:530px;overflow:auto;">
+				<!-- 마크다운 버튼 툴바 -->
+				<style>
+				  .toolbar {
+					background: #f5f5f5;
+					border-bottom: 1px solid #ccc;
+					padding: 8px;
+					display: flex;
+					gap: 5px;
+				  }
+				</style>
+				<div class="toolbar">
+					<button onclick="addMarkdown('# ', '')">제목</button>
+					<button onclick="insertLineMarkdown('- ')">글머리기호</button>
+					<button onclick="insertLineMarkdown('1. ')">번호매기기</button>
+					<button onclick="insertLineMarkdown('- [ ] ')">체크박스</button>
+					<button onclick="insertLink()">링크</button>
+					<button onclick="addMarkdown('**', '**')">굵게</button>
+					<button onclick="addMarkdown('*', '*')">기울임</button>
+					<button onclick="addMarkdown('```\n', '\n```')">코드블록</button>
+					<button onclick="insertTable()">테이블</button>
+				</div>
+				<style>
+				/* 미리보기 컨테이너 내의 테이블 스타일 */
+				#preview_md table {
+				  border-collapse: collapse; /* 테두리 겹침 제거 (선이 중복되어 두꺼워지는 것 방지) */
+				  width: 100%;               /* 테이블 너비 꽉 차게 */
+				  margin: 15px 0;            /* 위아래 여백 */
+				  font-size: 14px;
+				}
+				/* 헤더 셀(th)과 일반 셀(td)에 테두리(라인) 추가 */
+				#preview_md th, #preview_md td {
+				  border: 1px solid #d0d7de; /* 연한 회색 라인 */
+				  padding: 8px 12px;         /* 셀 내부 안쪽 여백 */
+				  text-align:left;
+				}
+				/* 테이블 헤더 배경색 지정 */
+				#preview_md th {
+				  background-color: #f6f8fa; /* 헤더 배경은 살짝 어둡게 */
+				  font-weight: bold;
+				  text-align:center;
+				}
+				/* 짝수 번째 행에 배경색을 넣어 가독성 높이기 (선택 사항) */
+				#preview_md tr:nth-child(even) {
+				  background-color: #f9f9f9;
+				}
+				</style>
+				<div style="resize:both;top:130px;width:51vw;border:1px solid #ccc;" id="editor" contenteditable="true"><?php echo htmlspecialchars($content);?></div>
+				<div id="right-box" style="resize:both;background-color:#f9f9f9;position:absolute;left:52vw;top:90px;width:48vw;height:530px;overflow:auto;">
 				<div id="preview_md" style="width:100vw">
 				로딩중...
 				</div>
 				</div>
 				<script>
+				function insertLineMarkdown(prefix) {
+				  var range = editor.getSelectionRange();				  
+				  // 아무것도 선택하지 않았을 때 현재 줄에 적용
+				  if (range.isEmpty()) {
+					var row = range.start.row;
+					var currentLine = editor.session.getLine(row);
+					editor.session.replace({
+					  start: { row: row, column: 0 },
+					  end: { row: row, column: currentLine.length }
+					}, prefix + currentLine);
+				  } else {
+					// 여러 줄을 선택했을 때 각 줄의 맨 앞에 적용
+					var lines = editor.session.getTextRange(range).split("\n");
+					var replacement = lines.map(line => prefix + line).join("\n");
+					editor.insert(replacement);
+				  }
+				  editor.focus();
+				}
+				function insertTable() {
+				  var tableTemplate = 
+					"| 헤더1 | 헤더2 | 헤더3 |\n" +
+					"| :--- | :---: | ---: |\n" +
+					"| 내용1 | 내용2 | 내용3 |\n" +
+					"| 내용4 | 내용5 | 내용6 |";
+				  editor.insert(tableTemplate);
+				  editor.focus();
+				}
+				function addMarkdown(prefix, suffix) {
+				  // 선택한 텍스트 가져오기
+				  var selectedText = editor.getCopyText();
+				  if (selectedText) {
+					// 선택된 텍스트가 있다면 감싸기
+					editor.insert(prefix + selectedText + suffix);
+				  } else {
+					// 선택된 텍스트가 없다면 접두사/접미사만 삽입
+					editor.insert(prefix + suffix);
+					// 커서를 접두사와 접미사 사이로 이동
+					var pos = editor.getCursorPosition();
+					pos.column -= suffix.length;
+					editor.moveCursorToPosition(pos);
+				  }
+				  editor.focus();
+				}
+				function insertLink() {
+				  var selectedText = editor.getCopyText();
+				  var url = prompt("URL을 입력하세요:", "https://");
+				  if (url) {
+					var text = selectedText ? selectedText : "링크 텍스트";
+					editor.insert("[" + text + "](" + url + ")");
+				  }
+				  editor.focus();
+				}
 				document.addEventListener("DOMContentLoaded", function() {
+					const leftBox = document.querySelector('.ace_scrollbar-v');
+					const rightBox = document.getElementById('right-box');
+					let isScrolling = false;
+					function syncScroll(source, target, t_name) {
+					  if (isScrolling) return; // 이미 연동 중이면 종료
+					  isScrolling = true;
+					  if(t_name=='rightBox')
+					  target.scrollTop = (source.scrollTop);
+					  else
+					  target.scrollTop = (source.scrollTop);
+					  setTimeout(() => { isScrolling = false; }, 50); // 딜레이 후 해제
+					}
+					leftBox.addEventListener('scroll', () => syncScroll(leftBox, rightBox, 'rightBox'));
+					rightBox.addEventListener('scroll', () => syncScroll(rightBox, leftBox, 'leftBox'));
+					
 					editor.setTheme("ace/theme/twilight"); // Dark Theme
 					var previewElement = document.getElementById('preview_md');
 					editor.session.on('change', function(delta) {
 						var markdownText = editor.getValue();
-						previewElement.innerHTML = marked.parse(markdownText);
+						var parseData = marked.parse(markdownText);
+						previewElement.innerHTML = parseData;
 					});
 					previewElement.innerHTML = marked.parse(editor.getValue());
 				});
