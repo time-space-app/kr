@@ -2230,8 +2230,31 @@ if (isset($_GET['edit']) && !FM_READONLY) {
 			</script>
 		<?php
         } elseif ($is_text) {
-            echo '<div id="editor" contenteditable="true">' . htmlspecialchars($content) . '</div>';
-        } else {
+		?>
+			<?php if($ext == "md") { //kimilguk ?>
+				<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+				<div style="width:50vw;border:1px solid #ccc;" id="editor" contenteditable="true"><?php echo htmlspecialchars($content);?></div>
+				<div style="background-color:#f9f9f9;position:absolute;left:52vw;top:90px;width:48vw;height:530px;overflow:auto;">
+				<div id="preview_md" style="width:100vw">
+				로딩중...
+				</div>
+				</div>
+				<script>
+				document.addEventListener("DOMContentLoaded", function() {
+					editor.setTheme("ace/theme/twilight"); // Dark Theme
+					var previewElement = document.getElementById('preview_md');
+					editor.session.on('change', function(delta) {
+						var markdownText = editor.getValue();
+						previewElement.innerHTML = marked.parse(markdownText);
+					});
+					previewElement.innerHTML = marked.parse(editor.getValue());
+				});
+				</script>
+			<?php }else{ ?>
+				<div id="editor" contenteditable="true"><?php echo htmlspecialchars($content);?></div>
+			<?php } ?>
+        <?php 
+		} else {
             fm_set_msg(lng('FILE EXTENSION IS NOT SUPPORTED'), 'error');
         }
         ?>
@@ -5458,6 +5481,7 @@ function fm_show_header_login()
         <?php if (isset($_GET['edit']) && isset($_GET['env']) && FM_EDIT_FILE && !FM_READONLY):
             $ext = pathinfo($_GET["edit"], PATHINFO_EXTENSION);
             $ext =  $ext == "js" ? "javascript" :  $ext;
+			$ext =  $ext == "md" ? "markdown" :  $ext; //kimilguk
         ?>
             <?php print_external('js-ace'); ?>
             <script>
