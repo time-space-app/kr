@@ -42,6 +42,20 @@ if ($_GET['target_file']) {
             font-size: 1em; /* 기본 글자 크기 */
             line-height: 1.5; /* 줄 간격 */
         }
+        .d-none{display:none!important}
+        .spin-svg {
+          animation: rotateAnimation 2s linear infinite;
+          transform-origin: center; /* 회전 기준점을 SVG의 정중앙으로 설정 */
+        }
+        
+        @keyframes rotateAnimation {
+          0% {
+            transform: rotate(360deg);
+          }
+          100% {
+            transform: rotate(0deg);
+          }
+        }
     </style>
 </head>
 <body>
@@ -49,24 +63,25 @@ if ($_GET['target_file']) {
 <div class="chat-container">
     <h3><?php echo $position.$targetFile ?>에 대해 물어보세요</h3>
     <div class="chat-box" id="chatBox"></div>
-    <textarea class="textarea" type="text" id="userInput" placeholder="질문을 입력하세요..."></textarea>
+    <textarea class="textarea" id="userInput" placeholder="질문을 입력하세요..."></textarea>
     <button onclick="sendMessage()">전송</button>
+    <svg id="loading-image" class="spin-svg d-none" width="30px" height="30px" style="vertical-align: middle;" enable-background="new 0 0 561 561" version="1.1" viewBox="0 0 561 561" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+		<path d="m280.5 76.5v-76.5l-102 102 102 102v-76.5c84.15 0 153 68.85 153 153 0 25.5-7.65 51-17.85 71.4l38.25 38.25c17.85-33.15 30.6-68.85 30.6-109.65 0-112.2-91.8-204-204-204zm0 357c-84.15 0-153-68.85-153-153 0-25.5 7.65-51 17.85-71.4l-38.25-38.25c-17.85 33.15-30.6 68.85-30.6 109.65 0 112.2 91.8 204 204 204v76.5l102-102-102-102v76.5z" fill="#006DF0"/>
+    </svg>
 </div>
 
 <script>
+    const loading = document.querySelector("#loading-image");
     async function sendMessage() {
+        loading.classList.remove("d-none");
         const input = document.getElementById('userInput');
         const chatBox = document.getElementById('chatBox');
-        
         if (input.value.trim() === '') return;
-
         // 사용자 메시지 화면 표시
         chatBox.innerHTML += `<div class="message user"><strong>나:</strong> ${input.value}</div>`;
-        
         const userMessage = input.value;
         input.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
-
         // 서버(PHP)로 전송
         try {
             const response = await fetch('api/chat-secure-api.php?target=<?php echo $position.$targetFile ?>', {
@@ -74,12 +89,12 @@ if ($_GET['target_file']) {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ message: userMessage }).toString()
             });
-
             const data = await response.json();
-            
             // 봇 답변 표시
+            loading.classList.add("d-none");
             chatBox.innerHTML += `<div class="message bot"><strong>챗봇:</strong> ${data.reply}</div>`;
         } catch (error) {
+            loading.classList.add("d-none");
             chatBox.innerHTML += `<div class="message bot"><strong>오류:</strong> 통신 실패 ${error}</div>`;
         }
         chatBox.scrollTop = chatBox.scrollHeight;
