@@ -265,7 +265,7 @@ $sql = "CREATE TABLE IF NOT EXISTS $table_name (
         	$fieldValues = [];
         	while ($field = mysqli_fetch_field($res)) {
     		    $fieldName = $field->name; // 필드명
-        		if($fieldName == 'id' || $fieldName == 'item_location' || $fieldName == 'item_price') {
+        		if($fieldName == 'item_location' || $fieldName == 'item_price') { //$fieldName == 'id' || 
         	        continue;
         	    }else{
         	        $fieldValues[] = $row[$fieldName]; // 필드 데이터
