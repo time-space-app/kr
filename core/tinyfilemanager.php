@@ -4167,7 +4167,7 @@ function fm_show_nav_path($path)
                                 <?php if (!FM_READONLY): ?>
                                     <a title="<?php echo lng('Settings') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;settings=1"><i class="fa fa-cog" aria-hidden="true"></i> <?php echo lng('Settings') ?>-<?php echo $_SESSION['filemanager']['logged'] ?></a>
                                     <a title="<?php echo lng('PhpInfo') ?>" class="dropdown-item nav-link" href="/core/util/phpinfo.php" target="_blank"><i class="fa fa-file" aria-hidden="true"></i> <?php echo lng('PhpInfo') ?></a>
-                                    <a title="<?php echo lng('DBAdminer') ?>" class="dropdown-item nav-link" href="/core/util/adminer.php" target="_blank"><i class="fa fa-database" aria-hidden="true"></i> <?php echo lng('DBAdminer') ?></a>
+                                    <a title="<?php echo lng('DBAdminer') ?>" class="dropdown-item nav-link" href="/core/util/dhwmanage.php" target="_blank"><i class="fa fa-database" aria-hidden="true"></i> <?php echo lng('DBAdminer') ?></a>
                                 <?php endif ?>
                                     <a title="<?php echo lng('Help') ?>" class="dropdown-item nav-link" href="?p=<?php echo urlencode(FM_PATH) ?>&amp;help=2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> <?php echo lng('Help') ?></a>
                                     <a title="<?php echo lng('Logout') ?>" class="dropdown-item nav-link" href="?logout=1"><i class="fa fa-sign-out" aria-hidden="true"></i> <?php echo lng('Logout') ?></a>
