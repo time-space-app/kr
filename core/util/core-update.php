@@ -10,7 +10,7 @@ if (!isset($_SESSION['filemanager']['logged'])) {
  */
 // 1. 최신 버전 정보 가져오기
 $remote_version_url = 'https://raw.githubusercontent.com/time-space-app/kr-update/refs/heads/main/version.json';
-$local_version = '1.0'; // 현재 내 사이트 버전
+$local_version = '1.1'; // 현재 내 사이트 버전
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $remote_version_url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

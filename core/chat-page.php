@@ -56,14 +56,24 @@
 </div>
 
 <script>
+	function escapeHtml(str) {
+      if (typeof str !== "string") return str;
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
     const loading = document.querySelector("#loading-image");
     async function sendMessage() {
         loading.classList.remove("d-none");
         const input = document.getElementById('userInput');
+		const inputValue = escapeHtml(input.value);//보안처리
         const chatBox = document.getElementById('chatBox');
         if (input.value.trim() === '') return;
         // 사용자 메시지 화면 표시
-        chatBox.innerHTML += `<div class="message user"><strong>Me:</strong> ${input.value}</div>`;
+        chatBox.innerHTML += `<div class="message user"><strong>Me:</strong> ${inputValue}</div>`;
         const userMessage = input.value;
         input.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
