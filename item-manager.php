@@ -107,6 +107,18 @@
     });
 </script>
 <?php
+function maskName($name) { // 이름 마스킹처리 함수
+	$length = mb_strlen($name, 'UTF-8');
+	if ($length <= 1) return $name;
+	if ($length === 2) {
+		return mb_substr($name, 0, 1, 'UTF-8') . '*';
+	} elseif ($length === 3) {
+		return mb_substr($name, 0, 1, 'UTF-8') . '*' . mb_substr($name, 2, 1, 'UTF-8');
+	} else {
+		$middle = str_repeat('*', $length - 2);
+		return mb_substr($name, 0, 1, 'UTF-8') . $middle . mb_substr($name, $length - 1, 1, 'UTF-8');
+	}
+}
 $table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 // 설정 파일 불러오기
 $env = include_once __DIR__ . '/core/env.php';
@@ -261,12 +273,14 @@ $sql = "CREATE TABLE IF NOT EXISTS $table_name (
     	<div class="display-table-cell vertical-align-top" style="cursor:pointer" <?php if (isset($_SESSION['filemanager']['logged'])){ ?> onclick="openItemForm('edit',<?php echo $row['id'] ?>)" <?php } ?>>
     	<h3 class="font-weight-700 m9-f-large" style="margin-bottom:5px;"><?php echo $row['item_location'] ?></h3>
         	<div class="m9-f-small m9-font-color-3">
-        	<?php 
+        	<?php
         	$fieldValues = [];
         	while ($field = mysqli_fetch_field($res)) {
     		    $fieldName = $field->name; // 필드명
         		if($fieldName == 'item_location' || $fieldName == 'item_price') { //$fieldName == 'id' || 
         	        continue;
+				}else if($fieldName == 'item_user'){
+					$fieldValues[] = maskName($row[$fieldName]);
         	    }else{
         	        $fieldValues[] = $row[$fieldName]; // 필드 데이터
         	    }

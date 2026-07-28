@@ -71,21 +71,19 @@ $(document).ready(function() {
 });
 </script>
 <?php
-$table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
-function maskName($name) {
-    $length = mb_strlen($name, 'UTF-8'); // 이름의 총 길이 계산
-    if ($length <= 2) {
-        // 2자 이하인 경우 첫 글자만 남기고 두 번째 글자 마스킹
-        $masked = mb_substr($name, 0, 1, 'UTF-8') . '*';
-    } else {
-        // 3자 이상인 경우 가운데 글자들을 *로 마스킹
-        $startStr = mb_substr($name, 0, 1, 'UTF-8'); // 첫 글자
-        $endStr = mb_substr($name, -1, 1, 'UTF-8');  // 마지막 글자
-        // 가운데 길이만큼 * 생성
-        $masked = $startStr . str_repeat('*', $length - 2) . $endStr;
-    }
-    return $masked;
+function maskName($name) { // 이름 마스킹처리 함수
+	$length = mb_strlen($name, 'UTF-8');
+	if ($length <= 1) return $name;
+	if ($length === 2) {
+		return mb_substr($name, 0, 1, 'UTF-8') . '*';
+	} elseif ($length === 3) {
+		return mb_substr($name, 0, 1, 'UTF-8') . '*' . mb_substr($name, 2, 1, 'UTF-8');
+	} else {
+		$middle = str_repeat('*', $length - 2);
+		return mb_substr($name, 0, 1, 'UTF-8') . $middle . mb_substr($name, $length - 1, 1, 'UTF-8');
+	}
 }
+$table_name = "item_manager"; //추가 테이블을 사용하려면 테이블명을 변경하면 됩니다.
 ?>
 <?php
     $mode = $_GET['mode'] ?? ''; //입력, 수정, 삭제
@@ -139,6 +137,8 @@ switch ($mode) {
             		    $fieldName = $field->name; // 필드명
                 		if($fieldName == 'item_location' || $fieldName == 'item_price') { //$fieldName == 'id' || 
                 	        continue;
+						}else if($fieldName == 'item_user'){
+							$fieldValues[] = maskName($row[$fieldName]);
                 	    }else{
                 	        $fieldValues[] = $row[$fieldName]; // 필드 데이터
                 	    }
