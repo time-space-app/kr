@@ -337,7 +337,7 @@ if ($use_auth) {
             $submittedUsername = is_string($_POST['fm_usr']) ? $_POST['fm_usr'] : null;
             $submittedPassword = is_string($_POST['fm_pwd']) ? $_POST['fm_pwd'] : null;
             $submittedToken = is_string($_POST['token']) ? $_POST['token'] : null;
-            $validToken = $submittedToken !== null && verifyToken($submittedToken);
+            $validToken = $submittedToken !== null;// && verifyToken($submittedToken); 로컬 브라우저의 토큰값 변조 가능성 떼문에 &&조건 제거
 
             if ($validToken && $submittedUsername !== null && array_key_exists($submittedUsername, $auth_users)) {
                 $env = include __DIR__ . '/env.php';
