@@ -332,15 +332,72 @@ if ($use_auth) {
         // Logging In
         sleep(1);
         if (function_exists('password_verify')) {
-            if (isset($auth_users[$_POST['fm_usr']]) && isset($_POST['fm_pwd']) && password_verify($_POST['fm_pwd'], $auth_users[$_POST['fm_usr']]) && verifyToken($_POST['token'])) {
-                $_SESSION[FM_SESSION_ID]['logged'] = $_POST['fm_usr'];
-                fm_set_msg(lng('You are logged in'));
-                fm_redirect(FM_SELF_URL);
-            } else {
-                unset($_SESSION[FM_SESSION_ID]['logged']);
-                fm_set_msg(lng('Login failed. Invalid username or password'), 'error');
-                fm_redirect(FM_SELF_URL);
+            // *로그인보안직업 시작 Check for login attempts and lockout
+            $lockoutRemaining = 0; // 로그인 시도 초기값
+            $submittedUsername = is_string($_POST['fm_usr']) ? $_POST['fm_usr'] : null;
+            $submittedPassword = is_string($_POST['fm_pwd']) ? $_POST['fm_pwd'] : null;
+            $submittedToken = is_string($_POST['token']) ? $_POST['token'] : null;
+            $validToken = $submittedToken !== null && verifyToken($submittedToken);
+
+            if ($validToken && $submittedUsername !== null && array_key_exists($submittedUsername, $auth_users)) {
+                $env = include __DIR__ . '/env.php';
+                $servername = $_ENV['DB_HOST'] ?? $env['DB_HOST'];
+                $username = $_ENV['DB_USER'] ?? $env['DB_USER'];
+                $password = $_ENV['DB_PASS'] ?? $env['DB_PASS'];
+                $dbname = $_ENV['DB_NAME'] ?? $env['DB_NAME'];
+                $loginDb = new mysqli($servername, $username, $password, $dbname);
+                if ($loginDb->connect_errno) {
+                    throw new RuntimeException('Failed to connect to the login attempt database: ' . $loginDb->connect_error);
+                }
+                if (!$loginDb->set_charset('utf8mb4')) {
+                    throw new RuntimeException('Failed to set the login attempt database charset: ' . $loginDb->error);
+                }
+
+                $createSessionsTable = "
+                    CREATE TABLE IF NOT EXISTS sessions (
+                        id VARCHAR(128) NOT NULL PRIMARY KEY,
+                        access INT UNSIGNED NOT NULL,
+                        data MEDIUMTEXT NOT NULL,
+                        ip_address VARCHAR(45) NOT NULL DEFAULT '',
+                        user_agent TEXT NOT NULL
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+                ";
+                if (!$loginDb->query($createSessionsTable)) {
+                    throw new RuntimeException('Failed to initialize login attempts: ' . $loginDb->error);
+                }
+
+                require_once __DIR__ . '/DbSessionHandler.php';
+                $loginAttemptHandler = new DbSessionHandler($loginDb);
+                $maxLoginAttempts = 5;
+                $loginLockoutTime = 30 * 60;
+                $lockoutRemaining = $loginAttemptHandler->getLoginLockoutRemaining(
+                    $submittedUsername,
+                    $maxLoginAttempts,
+                    $loginLockoutTime
+                );
+
+                if ($lockoutRemaining === 0 && $submittedPassword !== null
+                    && password_verify($submittedPassword, $auth_users[$submittedUsername])) {
+                    $loginAttemptHandler->resetLoginAttempts($submittedUsername);
+                    $_SESSION[FM_SESSION_ID]['logged'] = $submittedUsername;
+                    fm_set_msg(lng('You are logged in'));
+                    fm_redirect(FM_SELF_URL);
+                }
+
+                if ($lockoutRemaining === 0) {
+                    $loginAttemptHandler->recordLoginFailure($submittedUsername, $loginLockoutTime);
+                }
             }
+            // *로그인보안직업 끝
+            unset($_SESSION[FM_SESSION_ID]['logged']);
+            fm_set_msg(lng('Login failed. Invalid username or password'), 'error');
+            // *로그인보안직업 시작 로그인 실패시 메세지 출력
+            if($lockoutRemaining > 5) {
+                // 잘못된 로그인 시도시 메세지 출력 출력 후 로그인 페이지로 리다이렉트
+                fm_set_msg(lng('Access denied. '.$_POST['fm_usr'].' account has been locked due to failed password attempts.'), 'error');
+            }
+            // *로그인보안직업 끝
+            fm_redirect(FM_SELF_URL);
         } else {
             fm_set_msg(lng('password_hash not supported, Upgrade PHP version'), 'error');;
         }
