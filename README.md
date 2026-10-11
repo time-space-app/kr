@@ -40,6 +40,8 @@
     ├── chat-secure.php(제미나이 기반의 RAG-검색 증강 생성 챗봇을 코어 에디터 기반으로 구현한 UI샘플화면-소스를 수정하는 기능으로 보안때문에 관리자만 사용가능)
     ├── config.txt(티니파일매니저 환경설정 파일로 내부소스에서 admin, user암호만 변경 후 config.php로 파일확장자명만 변경후 빌더를 실행한다.)
     ├── env.txt(타임스페이스 kr빌더의 환경설정 파일로 DB와 구글지도를 사용한다면 해당 정보를 입력 후 env.php로 파일확장자명만 변경후 빌더를 실행한다.)
+    ├── DbSessionHandler.php(악성 로그인시도를 DB세션값으로 일정시간 제한하는 DB핸들러이다.)
+    ├── tinyfilemanager_DB없이브라우저의PHPSESSID로보안강화.org(DB를 사용하지 못한다면 브라우저의 쿠키를 사용한 악성 로그인시도를 제한하는 코드이다.)
     ├── tinyfilemanager.org(티니파일매니저 원본 오픈소스. 아래 타임스페이스 kr빌더에서 변경한 tinyfilemanager.php 파일과 비교 시 확인용으로 사용한다.)
     └── tinyfilemanager.php(파일관리자로 로그인 후 1개의 파일에 실행소스가 모두 포함되어 있다. 수정된 오픈소스사용)
 ├── smarteditor2/ (몽9에디터를 플러그인으로 사용할 디자인에디터에 플러그인폴더만 추가 후 https에서 http호출을 허용한 메타태그만 추가한 원본 오픈소스사용)
