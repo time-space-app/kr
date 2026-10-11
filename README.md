@@ -59,7 +59,7 @@
 - 현재 깃 허브에서 최신 버전이 포함된 ZIP 파일을 다운로드하세요.
 - 다운로드 후 core 폴더내부의 파일 이름은 바꾸지 마세요. 타임스페이스 kr빌더를 관리자화면에서 최신 버전으로 업데이트 할 수 없게 됩니다.
 - 기본 사용자 이름/비밀번호: admin/admin@123 및 user/12345 입니다.(아래)
-- 단 1.1버전 부터는 악성 로그인제한을 DB세션으로 맞추어 놓았기 때문에 MySQL DB셋팅 후 로그인 가능하십니다. 만약 DB를 사용하지 않고 테스트해 보시려면, 안성 로그인제한 처리를 쿠키로 사용한 core/tinyfilemanager_DB없이브라우저의PHPSESSID로보안강화.org 파일을 tinyfilemanager.php로 변경하시고 사용하시면 됩니다.(당연히 기존 tinyfilemanager.php는 이름을 바꾸셔야 합니다.)
+- 단 1.1버전 부터는 악성 로그인제한을 DB세션으로 맞추어 놓았기 때문에 MySQL DB셋팅 후 로그인 가능하십니다. 만약 DB를 사용하지 않고 테스트해 보시려면, 악성로그인 제한 처리를 쿠키로 사용한 core/tinyfilemanager_DB없이브라우저의PHPSESSID로보안강화.org 파일을 tinyfilemanager.php로 변경하시고 사용하시면 됩니다.(당연히 기존 tinyfilemanager.php는 이름을 바꾸셔야 합니다.)
 - 위 작업이 귀찮으시면 로그인 보안이 약한 1.0버전을 테스트해 보셔도 좋습니다. 1.0버전위치: https://github.com/time-space-app/kr/tree/v1.0 
 - 암호를 변경 하려면 아래 방법을 사용하세요.
 > [!WARNING]
