@@ -353,6 +353,8 @@ if ($use_auth) {
         
         // 실패 시도 데이터가 없는 경우 초기화합니다. *로그인보안추가 시작
         $username = $_POST['fm_usr'];
+        // 주의 브라우저의 phpsessid 값을 악의적으로 바꾸면 php서버에서 매칭된 기존 $_session 변수를 찾지 못해서
+        // 기존 $_SESSION[session_id] 변수가 없는 것처럼 실행된다. 즉, 아래 악성로그인 제한기능이 소용없게 된다. 그래서 DB세션을 사용
         if (!isset($_SESSION[FM_SESSION_ID][FM_SESSION_FAILED_ATTEMPTS])) {
             $_SESSION[FM_SESSION_ID][FM_SESSION_FAILED_ATTEMPTS] = [];
         }

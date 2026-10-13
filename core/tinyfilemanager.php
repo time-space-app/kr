@@ -337,7 +337,7 @@ if ($use_auth) {
             $submittedUsername = is_string($_POST['fm_usr']) ? $_POST['fm_usr'] : null;
             $submittedPassword = is_string($_POST['fm_pwd']) ? $_POST['fm_pwd'] : null;
             $submittedToken = is_string($_POST['token']) ? $_POST['token'] : null;
-            $validToken = $submittedToken !== null;// && verifyToken($submittedToken); 로컬 브라우저의 토큰값 변조 가능성 떼문에 &&조건 제거
+            $validToken = $submittedToken !== null && verifyToken($submittedToken); // phpsessid 토큰값을 악의적으로 변조할 가능성 체크
 
             if ($validToken && $submittedUsername !== null && array_key_exists($submittedUsername, $auth_users)) {
                 $env = include __DIR__ . '/env.php';
@@ -395,6 +395,9 @@ if ($use_auth) {
             if($lockoutRemaining > 5) {
                 // 잘못된 로그인 시도시 메세지 출력 출력 후 로그인 페이지로 리다이렉트
                 fm_set_msg(lng('Access denied. '.$_POST['fm_usr'].' account has been locked due to failed password attempts.'), 'error');
+            }
+            if (!$validToken) { //  로컬 브라우저의 토큰값 변조 가능성 떼문에 추가
+                fm_set_msg(lng('Login failed. Invalid Browser Token'), 'error');
             }
             // *로그인보안직업 끝
             fm_redirect(FM_SELF_URL);
